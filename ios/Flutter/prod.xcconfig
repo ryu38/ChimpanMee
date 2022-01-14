@@ -1,0 +1,13 @@
+//
+//  prod.xcconfig
+//  Runner
+//
+//  Created by no145 on 2022/01/15.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+FLAVOR=prod
+APP_ID_SUFFIX=
+DISP_NAME_SUFFIX=
