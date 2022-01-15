@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'package:chimpanmee/l10n/l10n.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,6 +13,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      localizationsDelegates: L10n.localizationsDelegates,
+      supportedLocales: L10n.supportedLocales,
+      localeResolutionCallback: (locale, supportedLocales) {
+        if (locale != null) {
+          final _locale = Locale(locale.languageCode);
+          if (supportedLocales.contains(_locale)) {
+            return _locale;
+          }
+        }
+        return supportedLocales.first;
+      },
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -32,43 +42,31 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late String _buildMode;
-  String? _packageName;
-  String? _appName;
-
-  @override
-  void initState() {
-    super.initState();
-    loadPackageName();
-    setState(() {
-      _buildMode = kDebugMode ? 'debug' : 'release';
-    });
-  }
-
-  Future<void> loadPackageName() async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    setState(() {
-      _packageName = packageInfo.packageName;
-      _appName = packageInfo.appName;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = L10n.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          children: [
-            const Spacer(),
-            Text(_buildMode),
-            Text(_packageName ?? 'loading...'),
-            Text(_appName ?? ''),
-            const Spacer(),
-          ],
-        ),
+        child: Text(l10n.helloWorld),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.photo_camera),
+            label: l10n.navBarCamera,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.insert_photo),
+            label: l10n.navBarGallery,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.web),
+            label: l10n.navBarWeb,
+          ),
+        ],
       ),
     );
   }

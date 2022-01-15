@@ -47,3 +47,5 @@ app.*.map.json
 
 #custom
 **/ios/Flutter/DartDefines.xcconfig
+
+**/l10n/*.dart

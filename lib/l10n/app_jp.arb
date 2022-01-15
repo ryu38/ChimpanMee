@@ -1,0 +1,9 @@
+{
+  "@@locale": "ja",
+  
+  "helloWorld": "こんにちは、世界",
+
+  "navBarCamera": "カメラ",
+  "navBarGallery": "ギャラリー",
+  "navBarWeb": "ウェブ"
+}
