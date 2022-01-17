@@ -1,5 +1,6 @@
-import 'package:chimpanmee/Color.dart';
+import 'package:chimpanmee/color.dart';
 import 'package:chimpanmee/l10n/l10n.dart';
+import 'package:chimpanmee/ui/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -10,11 +11,12 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
+  String get title => 'ChimpanMee';
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: title,
       localizationsDelegates: L10n.localizationsDelegates,
       supportedLocales: L10n.supportedLocales,
       localeResolutionCallback: (locale, supportedLocales) {
@@ -28,13 +30,14 @@ class MyApp extends StatelessWidget {
       },
       theme: ThemeData(
         primarySwatch: Colors.green,
-        primaryColor: AppColors.coffee,
+        primaryColor: Colors.brown,
+        
         scaffoldBackgroundColor: AppColors.backWhite,
         appBarTheme: AppBarTheme(
           systemOverlayStyle: SystemUiOverlayStyle(
             statusBarColor: AppColors.backWhite,
-            statusBarBrightness: Brightness.dark,
-            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light, //IOS
+            statusBarIconBrightness: Brightness.dark, //Android
           ),
           backgroundColor: AppColors.backWhite,
           foregroundColor: AppColors.brightBlack,
@@ -47,66 +50,10 @@ class MyApp extends StatelessWidget {
         bottomAppBarTheme: BottomAppBarTheme(
           color: AppColors.milkBanana,
           elevation: 0,
+          shape: const CircularNotchedRectangle(),
         ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    final l10n = L10n.of(context)!;
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
-      body: Center(
-        child: Text(l10n.helloWorld),
-      ),
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(top: 32),
-        padding: const EdgeInsets.all(8),
-        width: 80,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Theme.of(context).bottomAppBarTheme.color,
-        ),
-        child: FittedBox(
-          child: FloatingActionButton(
-            onPressed: () {},
-            child: const Icon(Icons.photo_camera),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.insert_photo),
-              ),
-              const SizedBox(width: 64),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.web),
-              ),
-            ],
-          ),
-        ),
-      ),
+      home: HomePage(title: title),
     );
   }
 }
