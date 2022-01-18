@@ -1,11 +1,23 @@
+import 'package:camera/camera.dart';
 import 'package:chimpanmee/color.dart';
 import 'package:chimpanmee/l10n/l10n.dart';
 import 'package:chimpanmee/ui/home.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() {
-  runApp(const MyApp());
+List<CameraDescription> cameras = [];
+final camerasProvider = Provider((ref) => cameras);
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    cameras = await availableCameras();
+  } on CameraException catch (ex) { 
+    if (kDebugMode) print(ex.code);
+  }
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -17,6 +29,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: title,
+      debugShowCheckedModeBanner: false,
       localizationsDelegates: L10n.localizationsDelegates,
       supportedLocales: L10n.supportedLocales,
       localeResolutionCallback: (locale, supportedLocales) {

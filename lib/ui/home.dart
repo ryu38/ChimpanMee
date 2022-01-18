@@ -1,17 +1,20 @@
 import 'package:chimpanmee/Color.dart';
 import 'package:chimpanmee/l10n/l10n.dart';
+import 'package:chimpanmee/ui/camera/camera.dart';
+import 'package:chimpanmee/ui/camera/camera_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   _Pages _currentPage = _Pages.gallery;
 
   GestureDetector _navButton({
@@ -51,25 +54,35 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> _fabAction(WidgetRef ref) async {
+    if (_currentPage == _Pages.camera) {
+      if (ref.read(cameraStateProvider).initialized) {
+        await ref.read(cameraStateProvider.notifier).switchCamera();
+      }
+    } else {
+      setState(() {
+        _currentPage = _Pages.camera;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
-      body: Center(
-        child: Text(l10n.helloWorld),
-      ),
+      body: _currentPage.widget,
       floatingActionButton: SizedBox(
         width: 72,
         child: FittedBox(
           child: FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                _currentPage = _Pages.camera;
-              });
+            onPressed: () async {
+              _fabAction(ref);
             },
-            child: const Icon(Icons.photo_camera),
+            child: _currentPage != _Pages.camera 
+                ? const Icon(Icons.photo_camera)
+                : const Icon(Icons.rotate_90_degrees_ccw),
           ),
         ),
       ),
@@ -114,3 +127,13 @@ class _HomePageState extends State<HomePage> {
 }
 
 enum _Pages { camera, gallery, web }
+
+extension _PageExt on _Pages {
+  static final widgets = <_Pages, Widget>{
+    _Pages.camera: CameraScreen(),
+    _Pages.gallery: const Center(child: Text('gallery here')),
+    _Pages.web: const Center(child: Text('web here')),
+  };
+
+  Widget get widget => widgets[this] ?? const Text('not implemented');
+}
