@@ -237,6 +237,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_exif_rotation:
+    dependency: "direct main"
+    description:
+      name: flutter_exif_rotation
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.3"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -249,6 +256,15 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_ml_image_transformation:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: fa2ad8ece2f8f4ad06478a612017596fcf6b1fc4
+      url: "https://github.com/ryu38/flutter-ML-imageTransformation.git"
+    source: git
+    version: "0.0.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:

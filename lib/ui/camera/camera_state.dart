@@ -40,7 +40,7 @@ class CameraStateNotifier extends StateNotifier<CameraState> {
   final List<CameraDescription> cameras;
 
   /// throw errors if failed
-  Future<void> initializer() async {
+  Future<void> initialize() async {
     if (cameras.isEmpty) {
       throw Exception('No cameras are available');
     }

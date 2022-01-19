@@ -15,13 +15,13 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  _Pages _currentPage = _Pages.gallery;
+  _Page _currentPage = _Page.gallery;
 
   GestureDetector _navButton({
     required IconData defaultIcon,
     required IconData activeIcon,
     required String labelText,
-    required _Pages targetPage,
+    required _Page targetPage,
     required void Function()? onPressed,
     bool reverse = false,
   }) {
@@ -55,13 +55,13 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Future<void> _fabAction(WidgetRef ref) async {
-    if (_currentPage == _Pages.camera) {
+    if (_currentPage == _Page.camera) {
       if (ref.read(cameraStateProvider).initialized) {
         await ref.read(cameraStateProvider.notifier).switchCamera();
       }
     } else {
       setState(() {
-        _currentPage = _Pages.camera;
+        _currentPage = _Page.camera;
       });
     }
   }
@@ -80,7 +80,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             onPressed: () async {
               _fabAction(ref);
             },
-            child: _currentPage != _Pages.camera 
+            child: _currentPage != _Page.camera 
                 ? const Icon(Icons.photo_camera)
                 : const Icon(Icons.rotate_90_degrees_ccw),
           ),
@@ -98,10 +98,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                 defaultIcon: Icons.insert_photo,
                 activeIcon: Icons.insert_photo_sharp,
                 labelText: l10n.navBarGallery,
-                targetPage: _Pages.gallery,
+                targetPage: _Page.gallery,
                 onPressed: () {
                   setState(() {
-                    _currentPage = _Pages.gallery;
+                    _currentPage = _Page.gallery;
                   });
                 },
                 reverse: true,
@@ -111,10 +111,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                 defaultIcon: Icons.web,
                 activeIcon: Icons.web_sharp,
                 labelText: l10n.navBarWeb,
-                targetPage: _Pages.web,
+                targetPage: _Page.web,
                 onPressed: () {
                   setState(() {
-                    _currentPage = _Pages.web;
+                    _currentPage = _Page.web;
                   });
                 },
               ),
@@ -126,13 +126,13 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 }
 
-enum _Pages { camera, gallery, web }
+enum _Page { camera, gallery, web }
 
-extension _PageExt on _Pages {
-  static final widgets = <_Pages, Widget>{
-    _Pages.camera: CameraScreen(),
-    _Pages.gallery: const Center(child: Text('gallery here')),
-    _Pages.web: const Center(child: Text('web here')),
+extension _PageExt on _Page {
+  static final widgets = <_Page, Widget>{
+    _Page.camera: CameraScreen(),
+    _Page.gallery: const Center(child: Text('gallery here')),
+    _Page.web: const Center(child: Text('web here')),
   };
 
   Widget get widget => widgets[this] ?? const Text('not implemented');
