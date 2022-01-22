@@ -260,8 +260,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: master
-      resolved-ref: fa2ad8ece2f8f4ad06478a612017596fcf6b1fc4
+      ref: develop
+      resolved-ref: "7055f56e6bbfa2902dc88fc4777657b0197abf16"
       url: "https://github.com/ryu38/flutter-ML-imageTransformation.git"
     source: git
     version: "0.0.1"

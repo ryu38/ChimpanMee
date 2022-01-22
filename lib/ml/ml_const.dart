@@ -24,12 +24,12 @@ class MLConst {
   }
 
   const MLConst._android(): this._(
-    assetModelPath: '', 
+    assetModelPath: 'assets/pytorch_model/GANModelFloat32.ptl', 
     appDirModelName: 'GANModel.ptl',
   );
 
   const MLConst._ios(): this._(
-    assetModelPath: '', 
+    assetModelPath: 'assets/coreml_model/GANModelFloat16.mlmodel', 
     appDirModelName: 'GANModel.mlmodel',
   );
 

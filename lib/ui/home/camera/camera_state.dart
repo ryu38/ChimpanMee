@@ -16,17 +16,13 @@ abstract class CameraState with _$CameraState {
 }
 
 final cameraStateProvider = StateNotifierProvider<CameraStateNotifier, CameraState>(
-  (ref) => CameraStateNotifier(cameras: ref.read(camerasProvider)),
+  (ref) => CameraStateNotifier(read: ref.read),
 );
 
 class CameraStateNotifier extends StateNotifier<CameraState> {
 
-  factory CameraStateNotifier({
-    required List<CameraDescription> cameras,
-  }) => CameraStateNotifier._(cameras: cameras);
-
-  CameraStateNotifier._({
-    required this.cameras,
+  CameraStateNotifier({
+    required this.read,
     int cameraId = 0,
     CameraController? controller,
   }) : super(CameraState(
@@ -37,7 +33,8 @@ class CameraStateNotifier extends StateNotifier<CameraState> {
 
   static int get initCameraId => 0;
 
-  final List<CameraDescription> cameras;
+  final Reader read;
+  List<CameraDescription> get cameras => read(camerasProvider);
 
   /// throw errors if failed
   Future<void> initialize() async {
@@ -64,6 +61,15 @@ class CameraStateNotifier extends StateNotifier<CameraState> {
       controller: controller,
       initialized: true,
     );
+  }
+
+  Future<void> disposeCamera() async {
+    if (state.controller != null) {
+      state = state.copyWith(
+        initialized: false,
+      );
+      await state.controller!.dispose();
+    }
   }
 
   static CameraController _getCameraController(CameraDescription camera) 

@@ -1,31 +1,34 @@
-import 'package:chimpanmee/Color.dart';
 import 'package:chimpanmee/l10n/l10n.dart';
-import 'package:chimpanmee/ui/camera/camera.dart';
-import 'package:chimpanmee/ui/camera/camera_state.dart';
+import 'package:chimpanmee/ui/home/camera/camera.dart';
+import 'package:chimpanmee/ui/home/camera/camera_state.dart';
+import 'package:chimpanmee/ui/home/home_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePage extends ConsumerStatefulWidget {
-  const HomePage({Key? key, required this.title}) : super(key: key);
+class HomeScaff extends ConsumerStatefulWidget {
+  const HomeScaff({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
+  ConsumerState<HomeScaff> createState() => _HomeScaffState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
-  _Page _currentPage = _Page.gallery;
+class _HomeScaffState extends ConsumerState<HomeScaff> {
+
+  HomeStateNotifier get homeNotifier => 
+      ref.read(homeStateProvider.notifier);
 
   GestureDetector _navButton({
     required IconData defaultIcon,
     required IconData activeIcon,
     required String labelText,
-    required _Page targetPage,
+    required AppPage targetPage,
     required void Function()? onPressed,
     bool reverse = false,
   }) {
-    final isPageMatch = _currentPage == targetPage;
+    final currentPage = ref.read(homeStateProvider).currentPage;
+    final isPageMatch = currentPage == targetPage;
     final activeColor = Theme.of(context).primaryColor;
     final widgetList = [
       Icon(
@@ -55,32 +58,34 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Future<void> _fabAction(WidgetRef ref) async {
-    if (_currentPage == _Page.camera) {
+    final currentPage = ref.read(homeStateProvider).currentPage;
+    if (currentPage == AppPage.camera) {
       if (ref.read(cameraStateProvider).initialized) {
         await ref.read(cameraStateProvider.notifier).switchCamera();
       }
     } else {
-      setState(() {
-        _currentPage = _Page.camera;
-      });
+      homeNotifier.moveToPage(AppPage.camera);
     }
   }
+  
 
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
+    final currentPage = 
+        ref.watch(homeStateProvider.select((v) => v.currentPage));
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
-      body: _currentPage.widget,
+      body: currentPage.widget,
       floatingActionButton: SizedBox(
         width: 72,
         child: FittedBox(
           child: FloatingActionButton(
             onPressed: () async {
-              _fabAction(ref);
+              await _fabAction(ref);
             },
-            child: _currentPage != _Page.camera 
+            child: currentPage != AppPage.camera 
                 ? const Icon(Icons.photo_camera)
                 : const Icon(Icons.rotate_90_degrees_ccw),
           ),
@@ -98,11 +103,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                 defaultIcon: Icons.insert_photo,
                 activeIcon: Icons.insert_photo_sharp,
                 labelText: l10n.navBarGallery,
-                targetPage: _Page.gallery,
+                targetPage: AppPage.gallery,
                 onPressed: () {
-                  setState(() {
-                    _currentPage = _Page.gallery;
-                  });
+                  homeNotifier.moveToPage(AppPage.gallery);
                 },
                 reverse: true,
               ),
@@ -111,10 +114,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                 defaultIcon: Icons.web,
                 activeIcon: Icons.web_sharp,
                 labelText: l10n.navBarWeb,
-                targetPage: _Page.web,
+                targetPage: AppPage.web,
                 onPressed: () {
                   setState(() {
-                    _currentPage = _Page.web;
+                    homeNotifier.moveToPage(AppPage.web);
                   });
                 },
               ),
@@ -126,13 +129,11 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 }
 
-enum _Page { camera, gallery, web }
-
-extension _PageExt on _Page {
-  static final widgets = <_Page, Widget>{
-    _Page.camera: CameraScreen(),
-    _Page.gallery: const Center(child: Text('gallery here')),
-    _Page.web: const Center(child: Text('web here')),
+extension PageExt on AppPage {
+  static final widgets = <AppPage, Widget>{
+    AppPage.camera: CameraScreen(),
+    AppPage.gallery: const Center(child: Text('gallery here')),
+    AppPage.web: const Center(child: Text('web here')),
   };
 
   Widget get widget => widgets[this] ?? const Text('not implemented');

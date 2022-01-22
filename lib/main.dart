@@ -1,32 +1,46 @@
 import 'package:camera/camera.dart';
 import 'package:chimpanmee/color.dart';
 import 'package:chimpanmee/l10n/l10n.dart';
-import 'package:chimpanmee/ui/home.dart';
+import 'package:chimpanmee/ml/ml_manager.dart';
+import 'package:chimpanmee/ui/error_screen.dart';
+import 'package:chimpanmee/ui/home/home.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-List<CameraDescription> cameras = [];
-final camerasProvider = Provider((ref) => cameras);
+// Provider works like late final.
+
+List<CameraDescription> _cameras = [];
+final camerasProvider = Provider((_) => _cameras);
+
+MLManager? _mlManager;
+final mlManagerProvider = Provider((_) => _mlManager);
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   try {
-    cameras = await availableCameras();
-  } on CameraException catch (ex) { 
-    if (kDebugMode) print(ex.code);
+    _cameras = await availableCameras();
+  } on Exception catch (e) { 
+    if (kDebugMode) print(e.toString());
+  }
+
+  try {
+    _mlManager = await MLManager.getManager;
+  } on Exception catch (e) {
+    if (kDebugMode) print(e.toString());
   }
 
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
 
   String get title => 'ChimpanMee';
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: title,
       debugShowCheckedModeBanner: false,
@@ -66,7 +80,9 @@ class MyApp extends StatelessWidget {
           shape: const CircularNotchedRectangle(),
         ),
       ),
-      home: HomePage(title: title),
+      home: ref.read(mlManagerProvider) != null 
+          ? HomeScaff(title: title)
+          : const ErrorScreen(),
     );
   }
 }

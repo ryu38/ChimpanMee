@@ -18,10 +18,16 @@ final _privateConstructorUsedError = UnsupportedError(
 class _$PreviewStateTearOff {
   const _$PreviewStateTearOff();
 
-  _PreviewState call({String? inputPath, String? outputPath}) {
+  _PreviewState call(
+      {String? inputPath,
+      String? outputPath,
+      required bool isOutputShown,
+      String? error}) {
     return _PreviewState(
       inputPath: inputPath,
       outputPath: outputPath,
+      isOutputShown: isOutputShown,
+      error: error,
     );
   }
 }
@@ -33,6 +39,8 @@ const $PreviewState = _$PreviewStateTearOff();
 mixin _$PreviewState {
   String? get inputPath => throw _privateConstructorUsedError;
   String? get outputPath => throw _privateConstructorUsedError;
+  bool get isOutputShown => throw _privateConstructorUsedError;
+  String? get error => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $PreviewStateCopyWith<PreviewState> get copyWith =>
@@ -44,7 +52,11 @@ abstract class $PreviewStateCopyWith<$Res> {
   factory $PreviewStateCopyWith(
           PreviewState value, $Res Function(PreviewState) then) =
       _$PreviewStateCopyWithImpl<$Res>;
-  $Res call({String? inputPath, String? outputPath});
+  $Res call(
+      {String? inputPath,
+      String? outputPath,
+      bool isOutputShown,
+      String? error});
 }
 
 /// @nodoc
@@ -59,6 +71,8 @@ class _$PreviewStateCopyWithImpl<$Res> implements $PreviewStateCopyWith<$Res> {
   $Res call({
     Object? inputPath = freezed,
     Object? outputPath = freezed,
+    Object? isOutputShown = freezed,
+    Object? error = freezed,
   }) {
     return _then(_value.copyWith(
       inputPath: inputPath == freezed
@@ -68,6 +82,14 @@ class _$PreviewStateCopyWithImpl<$Res> implements $PreviewStateCopyWith<$Res> {
       outputPath: outputPath == freezed
           ? _value.outputPath
           : outputPath // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isOutputShown: isOutputShown == freezed
+          ? _value.isOutputShown
+          : isOutputShown // ignore: cast_nullable_to_non_nullable
+              as bool,
+      error: error == freezed
+          ? _value.error
+          : error // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -80,7 +102,11 @@ abstract class _$PreviewStateCopyWith<$Res>
           _PreviewState value, $Res Function(_PreviewState) then) =
       __$PreviewStateCopyWithImpl<$Res>;
   @override
-  $Res call({String? inputPath, String? outputPath});
+  $Res call(
+      {String? inputPath,
+      String? outputPath,
+      bool isOutputShown,
+      String? error});
 }
 
 /// @nodoc
@@ -97,6 +123,8 @@ class __$PreviewStateCopyWithImpl<$Res> extends _$PreviewStateCopyWithImpl<$Res>
   $Res call({
     Object? inputPath = freezed,
     Object? outputPath = freezed,
+    Object? isOutputShown = freezed,
+    Object? error = freezed,
   }) {
     return _then(_PreviewState(
       inputPath: inputPath == freezed
@@ -107,6 +135,14 @@ class __$PreviewStateCopyWithImpl<$Res> extends _$PreviewStateCopyWithImpl<$Res>
           ? _value.outputPath
           : outputPath // ignore: cast_nullable_to_non_nullable
               as String?,
+      isOutputShown: isOutputShown == freezed
+          ? _value.isOutputShown
+          : isOutputShown // ignore: cast_nullable_to_non_nullable
+              as bool,
+      error: error == freezed
+          ? _value.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -114,16 +150,24 @@ class __$PreviewStateCopyWithImpl<$Res> extends _$PreviewStateCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_PreviewState with DiagnosticableTreeMixin implements _PreviewState {
-  _$_PreviewState({this.inputPath, this.outputPath});
+  _$_PreviewState(
+      {this.inputPath,
+      this.outputPath,
+      required this.isOutputShown,
+      this.error});
 
   @override
   final String? inputPath;
   @override
   final String? outputPath;
+  @override
+  final bool isOutputShown;
+  @override
+  final String? error;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PreviewState(inputPath: $inputPath, outputPath: $outputPath)';
+    return 'PreviewState(inputPath: $inputPath, outputPath: $outputPath, isOutputShown: $isOutputShown, error: $error)';
   }
 
   @override
@@ -132,7 +176,9 @@ class _$_PreviewState with DiagnosticableTreeMixin implements _PreviewState {
     properties
       ..add(DiagnosticsProperty('type', 'PreviewState'))
       ..add(DiagnosticsProperty('inputPath', inputPath))
-      ..add(DiagnosticsProperty('outputPath', outputPath));
+      ..add(DiagnosticsProperty('outputPath', outputPath))
+      ..add(DiagnosticsProperty('isOutputShown', isOutputShown))
+      ..add(DiagnosticsProperty('error', error));
   }
 
   @override
@@ -142,14 +188,19 @@ class _$_PreviewState with DiagnosticableTreeMixin implements _PreviewState {
             other is _PreviewState &&
             const DeepCollectionEquality().equals(other.inputPath, inputPath) &&
             const DeepCollectionEquality()
-                .equals(other.outputPath, outputPath));
+                .equals(other.outputPath, outputPath) &&
+            const DeepCollectionEquality()
+                .equals(other.isOutputShown, isOutputShown) &&
+            const DeepCollectionEquality().equals(other.error, error));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(inputPath),
-      const DeepCollectionEquality().hash(outputPath));
+      const DeepCollectionEquality().hash(outputPath),
+      const DeepCollectionEquality().hash(isOutputShown),
+      const DeepCollectionEquality().hash(error));
 
   @JsonKey(ignore: true)
   @override
@@ -158,13 +209,20 @@ class _$_PreviewState with DiagnosticableTreeMixin implements _PreviewState {
 }
 
 abstract class _PreviewState implements PreviewState {
-  factory _PreviewState({String? inputPath, String? outputPath}) =
-      _$_PreviewState;
+  factory _PreviewState(
+      {String? inputPath,
+      String? outputPath,
+      required bool isOutputShown,
+      String? error}) = _$_PreviewState;
 
   @override
   String? get inputPath;
   @override
   String? get outputPath;
+  @override
+  bool get isOutputShown;
+  @override
+  String? get error;
   @override
   @JsonKey(ignore: true)
   _$PreviewStateCopyWith<_PreviewState> get copyWith =>

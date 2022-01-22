@@ -1,5 +1,6 @@
 import 'package:chimpanmee/ml/ml_const.dart';
 import 'package:chimpanmee/utlis/file_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_ml_image_transformation/flutter_ml_image_transformation.dart';
 
 class MLManager {
@@ -8,13 +9,15 @@ class MLManager {
     required this.modelPath,
   });
 
-  static Future<MLManager> get init async {
+  static Future<MLManager> get getManager async {
     final modelPath = await copyAssetToAppDir(
         MLConst().assetModelPath, MLConst().appDirModelName);
     final result = await MLImageTransformer.setModel(modelPath: modelPath);
     if (result != null) throw Exception(result);
     return MLManager._(modelPath: modelPath);
   }
+
+  final String modelPath;
 
   Future<String> transformImage(String imagePath) async {
     final outputPath = await joinPathToCache(MLConst().cacheOutputName);
@@ -24,8 +27,4 @@ class MLManager {
     if (result != null) throw Exception(result);
     return outputPath;
   }
-
-  final String modelPath;
-
-  
 }
