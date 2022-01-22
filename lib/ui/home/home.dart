@@ -1,7 +1,7 @@
 import 'package:chimpanmee/l10n/l10n.dart';
 import 'package:chimpanmee/ui/home/camera/camera.dart';
 import 'package:chimpanmee/ui/home/camera/camera_state.dart';
-import 'package:chimpanmee/ui/home/home_state.dart';
+import 'package:chimpanmee/ui/home/home_states/page_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
