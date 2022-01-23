@@ -3,6 +3,7 @@ import 'package:chimpanmee/main.dart';
 import 'package:chimpanmee/ui/home/camera/camera_state.dart';
 import 'package:chimpanmee/ui/home/navigator.dart';
 import 'package:chimpanmee/utlis/file_utils.dart';
+import 'package:chimpanmee/components/square_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,8 +55,7 @@ class _CameraMain extends ConsumerStatefulWidget {
 
 class __CameraMainState extends ConsumerState<_CameraMain> {
 
-  Future<String> takePhoto(WidgetRef ref) async {
-    final controller = ref.read(cameraStateProvider).controller!;
+  Future<String> takePhoto(CameraController controller) async {
     final imageXFile = await controller.takePicture();
     await FlutterExifRotation.rotateAndSaveImage(path: imageXFile.path);
     return imageXFile.path;
@@ -70,20 +70,14 @@ class __CameraMainState extends ConsumerState<_CameraMain> {
       children: [
         isInitialized
             ? _CameraDisplayer(controller: controller!)
-            : AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
+            : const SquareBox(),
         const Spacer(),
         Center(
           child: ElevatedButton(
             onPressed: () async {
-              final path = await takePhoto(ref);
+              final path = await takePhoto(
+                ref.read(cameraStateProvider).controller!
+              );
               await ref.read(cameraStateProvider.notifier).disposeCamera();
               await navigatePreview(context, ref, inputPath: path);
               await ref.read(cameraStateProvider.notifier).initialize();

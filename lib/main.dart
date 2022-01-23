@@ -56,7 +56,7 @@ class MyApp extends ConsumerWidget {
         return supportedLocales.first;
       },
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.brown,
         primaryColor: Colors.brown,
         
         scaffoldBackgroundColor: AppColors.backWhite,

@@ -49,3 +49,6 @@ app.*.map.json
 **/ios/Flutter/DartDefines.xcconfig
 
 **/l10n/*.dart
+
+assets/coreml_model
+assets/pytorch_model
