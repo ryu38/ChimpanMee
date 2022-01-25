@@ -1,6 +1,9 @@
 import 'package:chimpanmee/l10n/l10n.dart';
 import 'package:chimpanmee/ui/home/camera/camera.dart';
 import 'package:chimpanmee/ui/home/camera/camera_state.dart';
+import 'package:chimpanmee/ui/home/gallery/gallery.dart';
+import 'package:chimpanmee/ui/home/gallery/gallery_appbar.dart';
+import 'package:chimpanmee/ui/home/gallery/gallery_state.dart';
 import 'package:chimpanmee/ui/home/home_states/page_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,7 +32,7 @@ class _HomeScaffState extends ConsumerState<HomeScaff> {
   }) {
     final currentPage = ref.read(homeStateProvider).currentPage;
     final isPageMatch = currentPage == targetPage;
-    final activeColor = Theme.of(context).primaryColor;
+    final activeColor = Theme.of(this.context).primaryColor;
     final widgetList = [
       Icon(
         isPageMatch ? activeIcon : defaultIcon,
@@ -57,11 +60,11 @@ class _HomeScaffState extends ConsumerState<HomeScaff> {
     );
   }
 
-  Future<void> _fabAction(WidgetRef ref) async {
-    final currentPage = ref.read(homeStateProvider).currentPage;
+  Future<void> _fabAction(Reader read) async {
+    final currentPage = read(homeStateProvider).currentPage;
     if (currentPage == AppPage.camera) {
-      if (ref.read(cameraStateProvider).initialized) {
-        await ref.read(cameraStateProvider.notifier).switchCamera();
+      if (read(cameraStateProvider).initialized) {
+        await read(cameraStateProvider.notifier).switchCamera();
       }
     } else {
       homeNotifier.moveToPage(AppPage.camera);
@@ -76,14 +79,14 @@ class _HomeScaffState extends ConsumerState<HomeScaff> {
         ref.watch(homeStateProvider.select((v) => v.currentPage));
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
-      body: currentPage.widget,
+      appBar: currentPage.widgets.appBarGenerator(ref),
+      body: currentPage.widgets.body,
       floatingActionButton: SizedBox(
         width: 72,
         child: FittedBox(
           child: FloatingActionButton(
             onPressed: () async {
-              await _fabAction(ref);
+              await _fabAction(ref.read);
             },
             child: currentPage != AppPage.camera 
                 ? const Icon(Icons.photo_camera)
@@ -130,11 +133,36 @@ class _HomeScaffState extends ConsumerState<HomeScaff> {
 }
 
 extension PageExt on AppPage {
-  static final widgets = <AppPage, Widget>{
-    AppPage.camera: CameraScreen(),
-    AppPage.gallery: const Center(child: Text('gallery here')),
-    AppPage.web: const Center(child: Text('web here')),
+  static final _widgets = <AppPage, PageWidgetData>{
+    AppPage.camera: PageWidgetData(
+      body: CameraScreen(),
+    ),
+    AppPage.gallery: PageWidgetData(
+      body: GalleryScreen(),
+      appBarGenerator: galleryAppBarGenerator,
+    ),
+    AppPage.web: PageWidgetData(
+      body: const Center(child: Text('web here')),
+    ),
   };
 
-  Widget get widget => widgets[this] ?? const Text('not implemented');
+  PageWidgetData get widgets => _widgets[this] ?? 
+      PageWidgetData(
+        body: const Center(child: Text('web here')),
+      );
 }
+
+class PageWidgetData {
+  PageWidgetData({
+    required this.body,
+    AppBarGenerator? appBarGenerator,
+  }) {
+    this.appBarGenerator = appBarGenerator 
+        ?? (ref) => AppBar(title: const Text('ChimpanMee'));
+  }
+
+  final Widget body;
+  late final AppBarGenerator appBarGenerator;
+}
+
+typedef AppBarGenerator = AppBar Function(WidgetRef ref);
