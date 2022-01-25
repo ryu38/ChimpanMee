@@ -34,7 +34,8 @@ class GalleryStateNotifier extends StateNotifier<GalleryState> {
         albumList: const AsyncValue.loading(),
       );
     });
-    final albumList = await AsyncValue.guard(PhotoManager.getAssetPathList);
+    final albumList = await AsyncValue.guard(() => 
+        PhotoManager.getAssetPathList(type: RequestType.image));
     await albumList.maybeWhen(
       data: (v) async {
         final imageList = await v.first.getAssetListPaged(0, 30);
@@ -65,6 +66,22 @@ class GalleryStateNotifier extends StateNotifier<GalleryState> {
         currentAlbumId: id,
         imageList: imageList,
       );
+    });
+  }
+
+  Future<void> loadMore() async {
+    await state.albumList.whenOrNull(data: (albumList) async {
+      final imageList = state.imageList ?? [];
+      final loadedCount = imageList.length / 30;
+      final newImageList = await albumList[state.currentAlbumId]
+          .getAssetListPaged(loadedCount.toInt(), 30);
+      if (newImageList.isNotEmpty) {
+        debugLog('ok');
+        state = state.copyWith(
+          // adding list does not works
+          imageList: [...imageList, ...newImageList],
+        );
+      }
     });
   }
 }

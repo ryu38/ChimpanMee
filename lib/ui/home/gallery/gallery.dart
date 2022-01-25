@@ -38,7 +38,9 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
               ElevatedButton(
                 onPressed: () async {
                   final status = await Permission.storage.request();
+                  print(status);
                   if (status.isPermanentlyDenied) {
+                    print(status);
                     await openAppSettings();
                   } else if (status.isGranted) {
                     await ref.read(galleryStateProvider.notifier).init();
@@ -58,7 +60,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   }
 }
 
-class _Content extends ConsumerWidget {
+class _Content extends ConsumerStatefulWidget {
   const _Content({ 
     Key? key,
     required this.albumList,
@@ -67,28 +69,71 @@ class _Content extends ConsumerWidget {
   final List<AssetPathEntity> albumList;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  __ContentState createState() => __ContentState();
+}
+
+class __ContentState extends ConsumerState<_Content> {
+
+  bool _isLoadingMore = false;
+  Map<String, Uint8List> thumbCache = {};
+
+  Future<void> _loadByScroll(Reader read) async {
+    debugLog('load start !');
+    _isLoadingMore = true;
+    await read(galleryStateProvider.notifier).loadMore();
+    debugLog('load ended !');
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    _isLoadingMore = false;
+  }
+
+  Future<Uint8List?> _getThumb(List<AssetEntity> imageList, int index) async {
+    if (thumbCache.length > 90) {
+    thumbCache.remove(thumbCache.keys.first);
+    }
+    final imageId = imageList[index].id;
+    if (thumbCache[imageId] == null) {
+      final thumb = await imageList[index].thumbDataWithSize(120, 120);
+      if (thumb != null) {
+        thumbCache[imageId] = thumb;
+      }
+      return thumb;
+    }
+    return thumbCache[imageId];
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final imageList = 
         ref.watch(galleryStateProvider.select((v) => v.imageList)) ?? [];
 
-    return GridView.builder(
-      itemCount: imageList.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3, crossAxisSpacing: 4, mainAxisSpacing: 4,
-      ), 
-      itemBuilder: (context, index) {
-        return FutureBuilder<Uint8List?>(
-          future: imageList[index].thumbDataWithSize(120, 120),
-          builder: (context, snapshot) {
-            return snapshot.hasData
-                ? Image.memory(
-                    snapshot.data!,
-                    fit: BoxFit.cover,
-                  )
-                : Container();
-          }
-        );
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        final scrollDegree =
+            notification.metrics.pixels / notification.metrics.maxScrollExtent;
+        if (scrollDegree >= 0.97 && !_isLoadingMore) {
+          _loadByScroll(ref.read);
+        }
+        return false;
       },
+      child: GridView.builder(
+        itemCount: imageList.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, crossAxisSpacing: 4, mainAxisSpacing: 4,
+        ), 
+        itemBuilder: (context, index) {
+          return FutureBuilder<Uint8List?>(
+            future: _getThumb(imageList, index),
+            builder: (context, snapshot) {
+              return snapshot.hasData
+                  ? Image.memory(
+                      snapshot.data!,
+                      fit: BoxFit.cover,
+                    )
+                  : Container();
+            }
+          );
+        },
+      ),
     );
   }
 }
