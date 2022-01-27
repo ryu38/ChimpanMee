@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:chimpanmee/ui/home/edit/edit_hero_tag.dart';
 import 'package:chimpanmee/ui/home/gallery/gallery_state.dart';
+import 'package:chimpanmee/ui/home/navigator.dart';
 import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -124,10 +126,25 @@ class __ContentState extends ConsumerState<_Content> {
           return FutureBuilder<Uint8List?>(
             future: _getThumb(imageList, index),
             builder: (context, snapshot) {
+              final uniqueTag = generateEditHeroTag('gallery-$index');
               return snapshot.hasData
-                  ? Image.memory(
-                      snapshot.data!,
-                      fit: BoxFit.cover,
+                  ? GestureDetector(
+                      onTap: () async {
+                        final imageFile = await imageList[index].loadFile();
+                        if (imageFile != null) {
+                          await precacheImage(FileImage(imageFile), context);
+                          await navigateEdit(
+                            context, imageFile: imageFile, uniqueTag: uniqueTag,
+                          );
+                        }
+                      },
+                      child: Hero(
+                        tag: uniqueTag,
+                        child: Image.memory(
+                          snapshot.data!,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     )
                   : Container();
             }
