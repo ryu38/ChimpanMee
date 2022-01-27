@@ -3,7 +3,8 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:chimpanmee/components/toast.dart';
-import 'package:chimpanmee/ui/home/navigator.dart';
+import 'package:chimpanmee/ui/home/edit/edit.dart';
+import 'package:chimpanmee/ui/home/preview/preview.dart';
 import 'package:chimpanmee/utlis/file_utils.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:flutter/material.dart';
@@ -12,14 +13,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class CropScreen extends StatelessWidget {
   CropScreen({ 
     Key? key,
-    required this.imageFile,
   }) : super(key: key);
 
-  final File imageFile;
+  static const route = '${EditScreen.route}/crop';
+
   final _cropController = CropController();
 
   @override
   Widget build(BuildContext context) {
+
+    final imageFile = ModalRoute.of(context)!.settings.arguments! as File;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Adjust Crop'),
@@ -54,7 +58,8 @@ class _Content extends ConsumerWidget {
     final inputPath = await joinPathToCache('input.jpg');
     try {
       File(inputPath).writeAsBytesSync(image);
-      await navigatePreview(context, ref, inputPath: inputPath);
+      await Navigator.of(context).pushNamed(
+          PreviewScreen.route, arguments: inputPath);
     } on Exception {
       await showToast('Failed to save the image');
     }

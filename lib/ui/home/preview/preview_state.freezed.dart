@@ -19,7 +19,7 @@ class _$PreviewStateTearOff {
   const _$PreviewStateTearOff();
 
   _PreviewState call(
-      {String? inputPath,
+      {required String inputPath,
       String? outputPath,
       required bool isOutputShown,
       String? error}) {
@@ -37,7 +37,7 @@ const $PreviewState = _$PreviewStateTearOff();
 
 /// @nodoc
 mixin _$PreviewState {
-  String? get inputPath => throw _privateConstructorUsedError;
+  String get inputPath => throw _privateConstructorUsedError;
   String? get outputPath => throw _privateConstructorUsedError;
   bool get isOutputShown => throw _privateConstructorUsedError;
   String? get error => throw _privateConstructorUsedError;
@@ -53,7 +53,7 @@ abstract class $PreviewStateCopyWith<$Res> {
           PreviewState value, $Res Function(PreviewState) then) =
       _$PreviewStateCopyWithImpl<$Res>;
   $Res call(
-      {String? inputPath,
+      {String inputPath,
       String? outputPath,
       bool isOutputShown,
       String? error});
@@ -78,7 +78,7 @@ class _$PreviewStateCopyWithImpl<$Res> implements $PreviewStateCopyWith<$Res> {
       inputPath: inputPath == freezed
           ? _value.inputPath
           : inputPath // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       outputPath: outputPath == freezed
           ? _value.outputPath
           : outputPath // ignore: cast_nullable_to_non_nullable
@@ -103,7 +103,7 @@ abstract class _$PreviewStateCopyWith<$Res>
       __$PreviewStateCopyWithImpl<$Res>;
   @override
   $Res call(
-      {String? inputPath,
+      {String inputPath,
       String? outputPath,
       bool isOutputShown,
       String? error});
@@ -130,7 +130,7 @@ class __$PreviewStateCopyWithImpl<$Res> extends _$PreviewStateCopyWithImpl<$Res>
       inputPath: inputPath == freezed
           ? _value.inputPath
           : inputPath // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       outputPath: outputPath == freezed
           ? _value.outputPath
           : outputPath // ignore: cast_nullable_to_non_nullable
@@ -151,13 +151,13 @@ class __$PreviewStateCopyWithImpl<$Res> extends _$PreviewStateCopyWithImpl<$Res>
 
 class _$_PreviewState with DiagnosticableTreeMixin implements _PreviewState {
   _$_PreviewState(
-      {this.inputPath,
+      {required this.inputPath,
       this.outputPath,
       required this.isOutputShown,
       this.error});
 
   @override
-  final String? inputPath;
+  final String inputPath;
   @override
   final String? outputPath;
   @override
@@ -210,13 +210,13 @@ class _$_PreviewState with DiagnosticableTreeMixin implements _PreviewState {
 
 abstract class _PreviewState implements PreviewState {
   factory _PreviewState(
-      {String? inputPath,
+      {required String inputPath,
       String? outputPath,
       required bool isOutputShown,
       String? error}) = _$_PreviewState;
 
   @override
-  String? get inputPath;
+  String get inputPath;
   @override
   String? get outputPath;
   @override

@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:chimpanmee/color.dart';
+import 'package:chimpanmee/components/square_image.dart';
 import 'package:chimpanmee/components/toast.dart';
+import 'package:chimpanmee/ui/home/home.dart';
 import 'package:chimpanmee/ui/home/preview/preview_state.dart';
 import 'package:chimpanmee/utlis/debug.dart';
 import 'package:chimpanmee/components/square_box.dart';
@@ -13,13 +15,30 @@ import 'package:share_plus/share_plus.dart';
 class PreviewScreen extends StatelessWidget {
   const PreviewScreen({Key? key}) : super(key: key);
 
+  static const route = '/preview';
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('show the result'),
+
+    final inputPath = ModalRoute.of(context)!.settings.arguments! as String;
+
+    return ProviderScope(
+      overrides: [
+        previewStateProvider
+            .overrideWithProvider(previewStateProviderFamily(inputPath)),
+      ],
+      child: WillPopScope(
+        onWillPop: () async {
+          Navigator.of(context).popUntil(ModalRoute.withName(HomeScaff.route));
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('show the result'),
+          ),
+          body: _Content(),
+        ),
       ),
-      body: _Content(),
     );
   }
 }
@@ -32,19 +51,6 @@ class _Content extends ConsumerStatefulWidget {
 }
 
 class __ContentState extends ConsumerState<_Content> {
-  Widget getSquareImage(String? path) {
-    try {
-      if (path == null) throw Exception('null input');
-      return AspectRatio(
-        aspectRatio: 1,
-        child: Image.memory(
-          File(path).readAsBytesSync(),
-          fit: BoxFit.cover,
-        ),
-      );
-    } on Exception {}
-    return const SquareBox();
-  }
 
   Future<void> transformImage() async {
     try {
@@ -69,17 +75,13 @@ class __ContentState extends ConsumerState<_Content> {
     late final outputPath =
         ref.watch(previewStateProvider.select((v) => v.outputPath));
 
-    final isComplete = 
-        outputPath != null && isOutputShown;
-
     return Column(
       children: [
-        isComplete
-            ? getSquareImage(outputPath)
-            : getSquareImage(inputPath),
-        // !isComplete ? const LinearProgressIndicator() : const SizedBox(height: 1),
+        outputPath != null && isOutputShown
+            ? SquareImage(outputPath)
+            : SquareImage(inputPath),
         const Spacer(),
-        isComplete
+        outputPath != null
             ? _PreviewMenu()
             : Text(
               'transforming now ...',
@@ -115,25 +117,91 @@ class _PreviewMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(child: _MenuButton(
-            onPressed: () async {
-              await _saveImage(ref.read);
-            },
-            icon: const Icon(Icons.download),
-            child: const Text('Download'),
-            primary: Color(0xffFFc800),
-          )),
-          const SizedBox(width: 16),
-          Expanded(child: _MenuButton(
-            onPressed: () async {
-              await _shareImage(ref.read);
-            },
-            icon: const Icon(Icons.share),
-            child: const Text('Share'),
-          )),
+          const _ImageSwitcher(),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(child: _MenuButton(
+                onPressed: () async {
+                  await _saveImage(ref.read);
+                },
+                icon: const Icon(Icons.download),
+                primary: const Color(0xffFFc800),
+                child: const Text('Download'),
+              )),
+              const SizedBox(width: 16),
+              Expanded(child: _MenuButton(
+                onPressed: () async {
+                  await _shareImage(ref.read);
+                },
+                icon: const Icon(Icons.share),
+                child: const Text('Share'),
+              )),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _ImageSwitcher extends ConsumerWidget {
+  const _ImageSwitcher({ Key? key }) : super(key: key);
+
+  double get _cornerRadius => 8.0;
+  double get _imageSize => 64.0;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isOutputShown =
+        ref.watch(previewStateProvider.select((v) => v.isOutputShown));
+    late final inputPath =
+        ref.read(previewStateProvider).inputPath;
+    late final outputPath =
+        ref.read(previewStateProvider).outputPath!;
+
+    return GestureDetector(
+      onTap: () {
+        ref.read(previewStateProvider.notifier).switchImage();
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(_cornerRadius),
+          color: AppColors.milkCoffee,
+        ),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(4),
+              child: Container(
+                height: _imageSize,
+                width: _imageSize,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(_cornerRadius),
+                  image: DecorationImage(
+                    image: MemoryImage(File(
+                      isOutputShown ? inputPath : outputPath,
+                    ).readAsBytesSync()),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+            const Spacer(),
+            const Icon(Icons.rotate_left),
+            const SizedBox(width: 8),
+            const Text(
+              'show original',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+              ),
+            ),
+            const Spacer(),
+          ],
+        ),
       ),
     );
   }

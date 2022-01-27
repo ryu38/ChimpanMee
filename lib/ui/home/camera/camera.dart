@@ -1,7 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:chimpanmee/main.dart';
 import 'package:chimpanmee/ui/home/camera/camera_state.dart';
-import 'package:chimpanmee/ui/home/navigator.dart';
+import 'package:chimpanmee/ui/home/preview/preview.dart';
+import 'package:chimpanmee/utlis/debug.dart';
 import 'package:chimpanmee/utlis/file_utils.dart';
 import 'package:chimpanmee/components/square_box.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +80,9 @@ class __CameraMainState extends ConsumerState<_CameraMain> {
                 ref.read(cameraStateProvider).controller!
               );
               await ref.read(cameraStateProvider.notifier).disposeCamera();
-              await navigatePreview(context, ref, inputPath: path);
+              await Navigator.of(context).pushNamed(
+                PreviewScreen.route, arguments: path,
+              );
               await ref.read(cameraStateProvider.notifier).initialize();
             },
             style: ElevatedButton.styleFrom(

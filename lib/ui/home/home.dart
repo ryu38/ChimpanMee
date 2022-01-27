@@ -13,6 +13,8 @@ class HomeScaff extends ConsumerStatefulWidget {
 
   final String title;
 
+  static const route = '/';
+
   @override
   ConsumerState<HomeScaff> createState() => _HomeScaffState();
 }

@@ -9,7 +9,7 @@ part 'preview_state.freezed.dart';
 @freezed
 abstract class PreviewState with _$PreviewState {
   factory PreviewState({
-    String? inputPath,
+    required String inputPath,
     String? outputPath,
     required bool isOutputShown,
     String? error,
@@ -17,16 +17,22 @@ abstract class PreviewState with _$PreviewState {
 }
 
 final previewStateProvider = 
-    StateNotifierProvider<PreviewStateNotifier, PreviewState>(
-      (ref) => PreviewStateNotifier(
+    StateNotifierProvider.autoDispose<PreviewStateNotifier, PreviewState>(
+      (_) => throw UnimplementedError(),
+    );
+
+final previewStateProviderFamily = 
+    StateNotifierProvider.autoDispose.family<PreviewStateNotifier, PreviewState, String>(
+      (ref, inputPath) => PreviewStateNotifier(
         read: ref.read,
+        inputPath: inputPath,
       ),
     );
 
 class PreviewStateNotifier extends StateNotifier<PreviewState> {
   PreviewStateNotifier({
     required this.read,
-    String? inputPath,
+    required String inputPath,
     String? outputPath,
     bool isOutputShown = false,
   }) : super(PreviewState(
@@ -37,18 +43,11 @@ class PreviewStateNotifier extends StateNotifier<PreviewState> {
 
   final Reader read;
 
-  void setInputPath(String inputPath) {
-    debugLog(inputPath);
-    state = state.copyWith(
-      inputPath: inputPath,
-    );
-  }
-
   Future<void> getTransformed() async {
     debugLog('start ML process');
     final stopwatch = Stopwatch()..start();
     final outputPath = 
-        await read(mlManagerProvider)!.transformImage(state.inputPath!);
+        await read(mlManagerProvider)!.transformImage(state.inputPath);
     debugLog(outputPath);
     debugLog('exec time: ${stopwatch.elapsedMilliseconds}');
     state = state.copyWith(
@@ -57,12 +56,11 @@ class PreviewStateNotifier extends StateNotifier<PreviewState> {
     );
   }
 
-  void reset() {
-    state = state.copyWith(
-      inputPath: null,
-      outputPath: null,
-      isOutputShown: false,
-      error: null,
-    );
+  Future<void> switchImage() async {
+    if (state.outputPath != null) {
+      state = state.copyWith(
+        isOutputShown: !state.isOutputShown
+      );
+    }
   }
 }

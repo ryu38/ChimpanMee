@@ -2,9 +2,9 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:chimpanmee/components/toast.dart';
-import 'package:chimpanmee/ui/home/edit/edit_navigator.dart';
+import 'package:chimpanmee/ui/home/edit/crop/crop.dart';
 import 'package:chimpanmee/ui/home/edit/edit_props.dart';
-import 'package:chimpanmee/ui/home/navigator.dart';
+import 'package:chimpanmee/ui/home/preview/preview.dart';
 import 'package:chimpanmee/utlis/file_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,10 +12,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class EditScreen extends ConsumerWidget {
   const EditScreen({ 
     Key? key,
-    required this.props,
   }) : super(key: key);
 
-  final EditProps props;
+  static const route = 'edit';
 
   Future<void> _done(
     BuildContext context, WidgetRef ref, Uint8List image,
@@ -23,7 +22,9 @@ class EditScreen extends ConsumerWidget {
     final inputPath = await joinPathToCache('input.jpg');
     try {
       File(inputPath).writeAsBytesSync(image);
-      await navigatePreview(context, ref, inputPath: inputPath);
+      await Navigator.of(context).pushNamed(
+        PreviewScreen.route, arguments: inputPath
+      );
     } on Exception {
       await showToast('Failed to save the image');
     }
@@ -31,6 +32,9 @@ class EditScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+    final props = ModalRoute.of(context)!.settings.arguments! as EditProps;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit'),
@@ -41,7 +45,8 @@ class EditScreen extends ConsumerWidget {
           ),
           IconButton(
             onPressed: () async {
-              await navigateCrop(context, imageFile: props.imageFile);
+              await Navigator.of(context).pushNamed(
+                  CropScreen.route, arguments: props.imageFile);
             }, 
             icon: const Icon(Icons.crop),
           ),

@@ -3,7 +3,11 @@ import 'package:chimpanmee/color.dart';
 import 'package:chimpanmee/l10n/l10n.dart';
 import 'package:chimpanmee/ml/ml_manager.dart';
 import 'package:chimpanmee/ui/error_screen.dart';
+import 'package:chimpanmee/ui/home/edit/crop/crop.dart';
+import 'package:chimpanmee/ui/home/edit/edit.dart';
 import 'package:chimpanmee/ui/home/home.dart';
+import 'package:chimpanmee/ui/home/preview/preview.dart';
+import 'package:chimpanmee/ui/home/preview/preview_state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -80,9 +84,15 @@ class MyApp extends ConsumerWidget {
           shape: const CircularNotchedRectangle(),
         ),
       ),
-      home: ref.read(mlManagerProvider) != null 
-          ? HomeScaff(title: title)
-          : const ErrorScreen(),
+      initialRoute: '/',
+      routes: {
+        HomeScaff.route: (_) => ref.read(mlManagerProvider) != null 
+            ? HomeScaff(title: title)
+            : const ErrorScreen(),
+        PreviewScreen.route: (_) => PreviewScreen(),
+        EditScreen.route: (_) => EditScreen(),
+        CropScreen.route: (_) => CropScreen(),
+      },
     );
   }
 }

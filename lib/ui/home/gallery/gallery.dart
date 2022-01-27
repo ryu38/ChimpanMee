@@ -1,8 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:chimpanmee/ui/home/edit/edit.dart';
 import 'package:chimpanmee/ui/home/edit/edit_hero_tag.dart';
+import 'package:chimpanmee/ui/home/edit/edit_props.dart';
 import 'package:chimpanmee/ui/home/gallery/gallery_state.dart';
-import 'package:chimpanmee/ui/home/navigator.dart';
 import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -133,8 +134,10 @@ class __ContentState extends ConsumerState<_Content> {
                         final imageFile = await imageList[index].loadFile();
                         if (imageFile != null) {
                           await precacheImage(FileImage(imageFile), context);
-                          await navigateEdit(
-                            context, imageFile: imageFile, uniqueTag: uniqueTag,
+                          await Navigator.of(context).pushNamed(
+                            EditScreen.route, arguments: EditProps(
+                              imageFile: imageFile, uniqueTag: uniqueTag,
+                            ),
                           );
                         }
                       },
