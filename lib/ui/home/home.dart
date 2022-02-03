@@ -5,6 +5,8 @@ import 'package:chimpanmee/ui/home/gallery/gallery.dart';
 import 'package:chimpanmee/ui/home/gallery/gallery_appbar.dart';
 import 'package:chimpanmee/ui/home/gallery/gallery_state.dart';
 import 'package:chimpanmee/ui/home/home_states/page_state.dart';
+import 'package:chimpanmee/ui/home/web/web.dart';
+import 'package:chimpanmee/ui/home/web/web_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -80,19 +82,24 @@ class _HomeScaffState extends ConsumerState<HomeScaff> {
     final currentPage = 
         ref.watch(homeStateProvider.select((v) => v.currentPage));
 
+    final isKeyboardClosed = MediaQuery.of(context).viewInsets.bottom == 0.0;
+
     return Scaffold(
-      appBar: currentPage.widgets.appBarGenerator(ref),
+      appBar: currentPage.widgets.appBarGenerator(context, ref),
       body: currentPage.widgets.body,
-      floatingActionButton: SizedBox(
-        width: 72,
-        child: FittedBox(
-          child: FloatingActionButton(
-            onPressed: () async {
-              await _fabAction(ref.read);
-            },
-            child: currentPage != AppPage.camera 
-                ? const Icon(Icons.photo_camera)
-                : const Icon(Icons.rotate_90_degrees_ccw),
+      floatingActionButton: Visibility(
+        visible: isKeyboardClosed,
+        child: SizedBox(
+          width: 72,
+          child: FittedBox(
+            child: FloatingActionButton(
+              onPressed: () async {
+                await _fabAction(ref.read);
+              },
+              child: currentPage != AppPage.camera 
+                  ? const Icon(Icons.photo_camera)
+                  : const Icon(Icons.rotate_90_degrees_ccw),
+            ),
           ),
         ),
       ),
@@ -144,13 +151,14 @@ extension PageExt on AppPage {
       appBarGenerator: galleryAppBarGenerator,
     ),
     AppPage.web: PageWidgetData(
-      body: const Center(child: Text('web here')),
+      body: WebScreen(),
+      appBarGenerator: webAppBarGenerator,
     ),
   };
 
   PageWidgetData get widgets => _widgets[this] ?? 
       PageWidgetData(
-        body: const Center(child: Text('web here')),
+        body: const Center(child: Text('not implemented')),
       );
 }
 
@@ -160,11 +168,11 @@ class PageWidgetData {
     AppBarGenerator? appBarGenerator,
   }) {
     this.appBarGenerator = appBarGenerator 
-        ?? (ref) => AppBar(title: const Text('ChimpanMee'));
+        ?? (context, ref) => AppBar(title: const Text('ChimpanMee'));
   }
 
   final Widget body;
   late final AppBarGenerator appBarGenerator;
 }
 
-typedef AppBarGenerator = AppBar Function(WidgetRef ref);
+typedef AppBarGenerator = AppBar Function(BuildContext context, WidgetRef ref);

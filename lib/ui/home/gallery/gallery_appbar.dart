@@ -3,7 +3,7 @@ import 'package:chimpanmee/ui/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-AppBar _galleryAppBarGenerator(WidgetRef ref) {
+AppBar _galleryAppBarGenerator(BuildContext context, WidgetRef ref) {
   final albumId = 
       ref.watch(galleryStateProvider.select((v) => v.currentAlbumId));
   final actions = ref.watch(galleryStateProvider.select((v) => v.albumList)).whenOrNull(

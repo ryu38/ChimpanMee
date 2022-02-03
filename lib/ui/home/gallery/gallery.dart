@@ -135,7 +135,8 @@ class __ContentState extends ConsumerState<_Content> {
                         if (imageFile != null) {
                           await precacheImage(FileImage(imageFile), context);
                           await Navigator.of(context).pushNamed(
-                            EditScreen.route, arguments: EditProps(
+                            EditScreen.route, 
+                            arguments: EditProps(
                               imageFile: imageFile, uniqueTag: uniqueTag,
                             ),
                           );

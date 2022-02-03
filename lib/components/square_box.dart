@@ -10,7 +10,7 @@ class SquareBox extends StatelessWidget {
       child: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
-          color: Colors.black,
+          color: Colors.grey,
         ),
       ),
     );
