@@ -1,5 +1,4 @@
 import 'package:chimpanmee/color.dart';
-import 'package:chimpanmee/components/button.dart';
 import 'package:chimpanmee/components/square_box.dart';
 import 'package:chimpanmee/ui/home/edit/edit.dart';
 import 'package:chimpanmee/ui/home/edit/edit_hero_tag.dart';

@@ -16,16 +16,18 @@ abstract class GalleryState with _$GalleryState {
   }) = _GalleryState;
 }
 
-final galleryStateProvider = 
+final galleryStateProvider =
     StateNotifierProvider.autoDispose<GalleryStateNotifier, GalleryState>(
-      (ref) => GalleryStateNotifier()
-    );
+        (ref) => GalleryStateNotifier());
 
 class GalleryStateNotifier extends StateNotifier<GalleryState> {
-  GalleryStateNotifier() : super(GalleryState(
-    albumList: const AsyncValue.loading(),
-    currentAlbumId: 0,
-  )) { init(); }
+  GalleryStateNotifier()
+      : super(GalleryState(
+          albumList: const AsyncValue.loading(),
+          currentAlbumId: 0,
+        )) {
+    init();
+  }
 
   Future<void> init() async {
     debugLog('Gallery init');
@@ -34,15 +36,21 @@ class GalleryStateNotifier extends StateNotifier<GalleryState> {
         albumList: const AsyncValue.loading(),
       );
     });
-    final albumList = await AsyncValue.guard(() => 
-        PhotoManager.getAssetPathList(type: RequestType.image));
+    final albumList = await AsyncValue.guard(
+        () => PhotoManager.getAssetPathList(type: RequestType.image));
     await albumList.maybeWhen(
       data: (v) async {
-        final imageList = await v.first.getAssetListPaged(0, 30);
-        state = state.copyWith(
-          albumList: albumList,
-          imageList: imageList,
-        );
+        if (v.length != 0) {
+          final imageList = await v.first.getAssetListPaged(0, 30);
+          state = state.copyWith(
+            albumList: albumList,
+            imageList: imageList,
+          );
+        } else {
+          state = state.copyWith(
+            albumList: AsyncValue.error(Exception('No Album')),
+          );
+        }
       },
       orElse: () {
         state = state.copyWith(

@@ -20,12 +20,12 @@ class _$CameraStateTearOff {
 
   _CounterState call(
       {required int cameraId,
-      CameraController? controller,
-      required bool initialized}) {
+      required AsyncValue<CameraController> controller,
+      required bool isCameraActive}) {
     return _CounterState(
       cameraId: cameraId,
       controller: controller,
-      initialized: initialized,
+      isCameraActive: isCameraActive,
     );
   }
 }
@@ -36,8 +36,9 @@ const $CameraState = _$CameraStateTearOff();
 /// @nodoc
 mixin _$CameraState {
   int get cameraId => throw _privateConstructorUsedError;
-  CameraController? get controller => throw _privateConstructorUsedError;
-  bool get initialized => throw _privateConstructorUsedError;
+  AsyncValue<CameraController> get controller =>
+      throw _privateConstructorUsedError;
+  bool get isCameraActive => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $CameraStateCopyWith<CameraState> get copyWith =>
@@ -49,7 +50,10 @@ abstract class $CameraStateCopyWith<$Res> {
   factory $CameraStateCopyWith(
           CameraState value, $Res Function(CameraState) then) =
       _$CameraStateCopyWithImpl<$Res>;
-  $Res call({int cameraId, CameraController? controller, bool initialized});
+  $Res call(
+      {int cameraId,
+      AsyncValue<CameraController> controller,
+      bool isCameraActive});
 }
 
 /// @nodoc
@@ -64,7 +68,7 @@ class _$CameraStateCopyWithImpl<$Res> implements $CameraStateCopyWith<$Res> {
   $Res call({
     Object? cameraId = freezed,
     Object? controller = freezed,
-    Object? initialized = freezed,
+    Object? isCameraActive = freezed,
   }) {
     return _then(_value.copyWith(
       cameraId: cameraId == freezed
@@ -74,10 +78,10 @@ class _$CameraStateCopyWithImpl<$Res> implements $CameraStateCopyWith<$Res> {
       controller: controller == freezed
           ? _value.controller
           : controller // ignore: cast_nullable_to_non_nullable
-              as CameraController?,
-      initialized: initialized == freezed
-          ? _value.initialized
-          : initialized // ignore: cast_nullable_to_non_nullable
+              as AsyncValue<CameraController>,
+      isCameraActive: isCameraActive == freezed
+          ? _value.isCameraActive
+          : isCameraActive // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
@@ -90,7 +94,10 @@ abstract class _$CounterStateCopyWith<$Res>
           _CounterState value, $Res Function(_CounterState) then) =
       __$CounterStateCopyWithImpl<$Res>;
   @override
-  $Res call({int cameraId, CameraController? controller, bool initialized});
+  $Res call(
+      {int cameraId,
+      AsyncValue<CameraController> controller,
+      bool isCameraActive});
 }
 
 /// @nodoc
@@ -107,7 +114,7 @@ class __$CounterStateCopyWithImpl<$Res> extends _$CameraStateCopyWithImpl<$Res>
   $Res call({
     Object? cameraId = freezed,
     Object? controller = freezed,
-    Object? initialized = freezed,
+    Object? isCameraActive = freezed,
   }) {
     return _then(_CounterState(
       cameraId: cameraId == freezed
@@ -117,10 +124,10 @@ class __$CounterStateCopyWithImpl<$Res> extends _$CameraStateCopyWithImpl<$Res>
       controller: controller == freezed
           ? _value.controller
           : controller // ignore: cast_nullable_to_non_nullable
-              as CameraController?,
-      initialized: initialized == freezed
-          ? _value.initialized
-          : initialized // ignore: cast_nullable_to_non_nullable
+              as AsyncValue<CameraController>,
+      isCameraActive: isCameraActive == freezed
+          ? _value.isCameraActive
+          : isCameraActive // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
@@ -130,18 +137,20 @@ class __$CounterStateCopyWithImpl<$Res> extends _$CameraStateCopyWithImpl<$Res>
 
 class _$_CounterState with DiagnosticableTreeMixin implements _CounterState {
   _$_CounterState(
-      {required this.cameraId, this.controller, required this.initialized});
+      {required this.cameraId,
+      required this.controller,
+      required this.isCameraActive});
 
   @override
   final int cameraId;
   @override
-  final CameraController? controller;
+  final AsyncValue<CameraController> controller;
   @override
-  final bool initialized;
+  final bool isCameraActive;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'CameraState(cameraId: $cameraId, controller: $controller, initialized: $initialized)';
+    return 'CameraState(cameraId: $cameraId, controller: $controller, isCameraActive: $isCameraActive)';
   }
 
   @override
@@ -151,7 +160,7 @@ class _$_CounterState with DiagnosticableTreeMixin implements _CounterState {
       ..add(DiagnosticsProperty('type', 'CameraState'))
       ..add(DiagnosticsProperty('cameraId', cameraId))
       ..add(DiagnosticsProperty('controller', controller))
-      ..add(DiagnosticsProperty('initialized', initialized));
+      ..add(DiagnosticsProperty('isCameraActive', isCameraActive));
   }
 
   @override
@@ -163,7 +172,7 @@ class _$_CounterState with DiagnosticableTreeMixin implements _CounterState {
             const DeepCollectionEquality()
                 .equals(other.controller, controller) &&
             const DeepCollectionEquality()
-                .equals(other.initialized, initialized));
+                .equals(other.isCameraActive, isCameraActive));
   }
 
   @override
@@ -171,7 +180,7 @@ class _$_CounterState with DiagnosticableTreeMixin implements _CounterState {
       runtimeType,
       const DeepCollectionEquality().hash(cameraId),
       const DeepCollectionEquality().hash(controller),
-      const DeepCollectionEquality().hash(initialized));
+      const DeepCollectionEquality().hash(isCameraActive));
 
   @JsonKey(ignore: true)
   @override
@@ -182,15 +191,15 @@ class _$_CounterState with DiagnosticableTreeMixin implements _CounterState {
 abstract class _CounterState implements CameraState {
   factory _CounterState(
       {required int cameraId,
-      CameraController? controller,
-      required bool initialized}) = _$_CounterState;
+      required AsyncValue<CameraController> controller,
+      required bool isCameraActive}) = _$_CounterState;
 
   @override
   int get cameraId;
   @override
-  CameraController? get controller;
+  AsyncValue<CameraController> get controller;
   @override
-  bool get initialized;
+  bool get isCameraActive;
   @override
   @JsonKey(ignore: true)
   _$CounterStateCopyWith<_CounterState> get copyWith =>

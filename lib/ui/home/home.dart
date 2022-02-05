@@ -22,9 +22,7 @@ class HomeScaff extends ConsumerStatefulWidget {
 }
 
 class _HomeScaffState extends ConsumerState<HomeScaff> {
-
-  HomeStateNotifier get homeNotifier => 
-      ref.read(homeStateProvider.notifier);
+  HomeStateNotifier get homeNotifier => ref.read(homeStateProvider.notifier);
 
   GestureDetector _navButton({
     required IconData defaultIcon,
@@ -67,19 +65,17 @@ class _HomeScaffState extends ConsumerState<HomeScaff> {
   Future<void> _fabAction(Reader read) async {
     final currentPage = read(homeStateProvider).currentPage;
     if (currentPage == AppPage.camera) {
-      if (read(cameraStateProvider).initialized) {
-        await read(cameraStateProvider.notifier).switchCamera();
-      }
+      read(cameraStateProvider).controller.whenData((value) async => 
+          read(cameraStateProvider.notifier).switchCamera());
     } else {
       homeNotifier.moveToPage(AppPage.camera);
     }
   }
-  
 
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
-    final currentPage = 
+    final currentPage =
         ref.watch(homeStateProvider.select((v) => v.currentPage));
 
     final isKeyboardClosed = MediaQuery.of(context).viewInsets.bottom == 0.0;
@@ -96,7 +92,7 @@ class _HomeScaffState extends ConsumerState<HomeScaff> {
               onPressed: () async {
                 await _fabAction(ref.read);
               },
-              child: currentPage != AppPage.camera 
+              child: currentPage != AppPage.camera
                   ? const Icon(Icons.photo_camera)
                   : const Icon(Icons.rotate_90_degrees_ccw),
             ),
@@ -156,7 +152,8 @@ extension PageExt on AppPage {
     ),
   };
 
-  PageWidgetData get widgets => _widgets[this] ?? 
+  PageWidgetData get widgets =>
+      _widgets[this] ??
       PageWidgetData(
         body: const Center(child: Text('not implemented')),
       );
@@ -167,8 +164,8 @@ class PageWidgetData {
     required this.body,
     AppBarGenerator? appBarGenerator,
   }) {
-    this.appBarGenerator = appBarGenerator 
-        ?? (context, ref) => AppBar(title: const Text('ChimpanMee'));
+    this.appBarGenerator = appBarGenerator ??
+        (context, ref) => AppBar(title: const Text('ChimpanMee'));
   }
 
   final Widget body;

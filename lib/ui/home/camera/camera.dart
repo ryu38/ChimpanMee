@@ -1,15 +1,10 @@
 import 'package:camera/camera.dart';
-import 'package:chimpanmee/main.dart';
+import 'package:chimpanmee/components/square_box.dart';
 import 'package:chimpanmee/ui/home/camera/camera_state.dart';
 import 'package:chimpanmee/ui/home/preview/preview.dart';
-import 'package:chimpanmee/utlis/debug.dart';
-import 'package:chimpanmee/utlis/file_utils.dart';
-import 'package:chimpanmee/components/square_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-const _cachedImageName = 'output.jpg';
 
 class CameraScreen extends ConsumerWidget {
   const CameraScreen({
@@ -18,43 +13,24 @@ class CameraScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cameras = ref.read(camerasProvider);
-    return cameras.isNotEmpty
-        ? _CameraInitializer()
-        : const Center(
-            child: Text('No Cameras are available'),
-          );
-  }
-}
-
-class _CameraInitializer extends ConsumerWidget {
-  _CameraInitializer({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return FutureBuilder(
-      future: ref.read(cameraStateProvider.notifier).initialize(),
-      builder: (context, snapshot) {
-        return snapshot.hasError
-            ? const Center(child: Text('Error Occurred'))
-            : snapshot.connectionState != ConnectionState.done
-                ? const Center(child: CircularProgressIndicator())
-                : _CameraMain();
-      },
+    final asyncController =
+        ref.watch(cameraStateProvider.select((v) => v.controller));
+    return asyncController.when(
+      data: (controller) => _CameraMain(controller: controller),
+      error: (error, _) =>
+          const Center(child: Text('Error occurred while launching camera')),
+      loading: () => const CircularProgressIndicator(),
     );
   }
 }
 
-class _CameraMain extends ConsumerStatefulWidget {
-  const _CameraMain({Key? key}) : super(key: key);
+class _CameraMain extends ConsumerWidget {
+  const _CameraMain({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
 
-  @override
-  __CameraMainState createState() => __CameraMainState();
-}
-
-class __CameraMainState extends ConsumerState<_CameraMain> {
+  final CameraController controller;
 
   Future<String> takePhoto(CameraController controller) async {
     final imageXFile = await controller.takePicture();
@@ -63,25 +39,24 @@ class __CameraMainState extends ConsumerState<_CameraMain> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final controller = ref.watch(cameraStateProvider).controller;
-    final isInitialized =
-        ref.watch(cameraStateProvider.select((v) => v.initialized));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isCameraActive = 
+        ref.watch(cameraStateProvider.select((v) => v.isCameraActive));
     return Column(
       children: [
-        isInitialized
-            ? _CameraDisplayer(controller: controller!)
+        isCameraActive
+            ? _CameraDisplayer(controller: controller)
             : const SquareBox(),
         const Spacer(),
         Center(
           child: ElevatedButton(
             onPressed: () async {
-              final path = await takePhoto(
-                ref.read(cameraStateProvider).controller!
-              );
+              final path =
+                  await takePhoto(controller);
               await ref.read(cameraStateProvider.notifier).disposeCamera();
               await Navigator.of(context).pushNamed(
-                PreviewScreen.route, arguments: path,
+                PreviewScreen.route,
+                arguments: path,
               );
               await ref.read(cameraStateProvider.notifier).initialize();
             },

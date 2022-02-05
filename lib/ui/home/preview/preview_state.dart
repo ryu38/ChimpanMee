@@ -1,3 +1,4 @@
+import 'package:chimpanmee/init_values.dart';
 import 'package:chimpanmee/main.dart';
 import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/foundation.dart';
@@ -47,7 +48,7 @@ class PreviewStateNotifier extends StateNotifier<PreviewState> {
     debugLog('start ML process');
     final stopwatch = Stopwatch()..start();
     final outputPath = 
-        await read(mlManagerProvider)!.transformImage(state.inputPath);
+        await read(initProvider).mlManager.transformImage(state.inputPath);
     debugLog(outputPath);
     debugLog('exec time: ${stopwatch.elapsedMilliseconds}');
     state = state.copyWith(
