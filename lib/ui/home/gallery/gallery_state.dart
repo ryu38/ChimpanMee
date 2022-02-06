@@ -1,3 +1,5 @@
+import 'package:chimpanmee/components/app_error.dart';
+import 'package:chimpanmee/platform_permission.dart';
 import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,7 +42,7 @@ class GalleryStateNotifier extends StateNotifier<GalleryState> {
         () => PhotoManager.getAssetPathList(type: RequestType.image));
     await albumList.maybeWhen(
       data: (v) async {
-        if (v.length != 0) {
+        if (v.isNotEmpty) {
           final imageList = await v.first.getAssetListPaged(0, 30);
           state = state.copyWith(
             albumList: albumList,
@@ -48,7 +50,7 @@ class GalleryStateNotifier extends StateNotifier<GalleryState> {
           );
         } else {
           state = state.copyWith(
-            albumList: AsyncValue.error(Exception('No Album')),
+            albumList: AsyncValue.error(AppException('No Albums')),
           );
         }
       },
@@ -80,16 +82,26 @@ class GalleryStateNotifier extends StateNotifier<GalleryState> {
   Future<void> loadMore() async {
     await state.albumList.whenOrNull(data: (albumList) async {
       final imageList = state.imageList ?? [];
-      final loadedCount = imageList.length / 30;
+      final loadedCount = (imageList.length / 30).ceil();
       final newImageList = await albumList[state.currentAlbumId]
-          .getAssetListPaged(loadedCount.toInt(), 30);
+          .getAssetListPaged(loadedCount, 30);
       if (newImageList.isNotEmpty) {
-        debugLog('ok');
         state = state.copyWith(
           // adding list does not works
           imageList: [...imageList, ...newImageList],
         );
       }
     });
+  }
+
+  Future<void> retry() async {
+    // final status = await Permission.storage.request();
+    final status = await AppPermission().gallery.request();
+    debugLog(status.toString());
+    if (status.isPermanentlyDenied) {
+      await openAppSettings();
+    } else if (status.isGranted) {
+      await init();
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:chimpanmee/components/app_error.dart';
 import 'package:chimpanmee/init_values.dart';
 import 'package:chimpanmee/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,7 +41,7 @@ class CameraStateNotifier extends StateNotifier<CameraState> {
   Future<void> initialize() async {
     final controller = await AsyncValue.guard(() async {
       if (cameras.isEmpty) {
-        throw Exception('No cameras are available');
+        throw AppException('No cameras are available');
       }
       final controller = _getCameraController(cameras[state.cameraId]);
       await controller.initialize();

@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:chimpanmee/components/app_error.dart';
 import 'package:chimpanmee/components/square_box.dart';
 import 'package:chimpanmee/ui/home/camera/camera_state.dart';
 import 'package:chimpanmee/ui/home/preview/preview.dart';
@@ -11,6 +12,16 @@ class CameraScreen extends ConsumerWidget {
     Key? key,
   }) : super(key: key);
 
+  String handleException(Object err) {
+    String? msg;
+    if (err is Error) throw err;
+
+    if (err is AppException) {
+      msg = err.message;
+    }
+    return msg ?? 'Error occurred while launching camera';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncController =
@@ -18,7 +29,7 @@ class CameraScreen extends ConsumerWidget {
     return asyncController.when(
       data: (controller) => _CameraMain(controller: controller),
       error: (error, _) =>
-          const Center(child: Text('Error occurred while launching camera')),
+          Center(child: Text(handleException(error))),
       loading: () => const CircularProgressIndicator(),
     );
   }
@@ -40,7 +51,7 @@ class _CameraMain extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isCameraActive = 
+    final isCameraActive =
         ref.watch(cameraStateProvider.select((v) => v.isCameraActive));
     return Column(
       children: [
@@ -51,8 +62,7 @@ class _CameraMain extends ConsumerWidget {
         Center(
           child: ElevatedButton(
             onPressed: () async {
-              final path =
-                  await takePhoto(controller);
+              final path = await takePhoto(controller);
               await ref.read(cameraStateProvider.notifier).disposeCamera();
               await Navigator.of(context).pushNamed(
                 PreviewScreen.route,

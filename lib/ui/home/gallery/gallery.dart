@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:chimpanmee/components/app_error.dart';
+import 'package:chimpanmee/components/toast.dart';
 import 'package:chimpanmee/ui/home/edit/edit.dart';
 import 'package:chimpanmee/ui/home/edit/edit_hero_tag.dart';
 import 'package:chimpanmee/ui/home/edit/edit_props.dart';
@@ -12,59 +14,53 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-class GalleryScreen extends ConsumerStatefulWidget {
-  const GalleryScreen({ Key? key }) : super(key: key);
+class GalleryScreen extends ConsumerWidget {
+  const GalleryScreen({Key? key}) : super(key: key);
+
+  String handleException(Object err) {
+    String? msg;
+    if (err is Error) throw err;
+
+    if (err is AppException) {
+      msg = err.message;
+    } else if (err is PlatformException) {
+      msg = err.code;
+    }
+    return msg ?? 'failed to get photo library';
+  }
 
   @override
-  _GalleryScreenState createState() => _GalleryScreenState();
-}
-
-class _GalleryScreenState extends ConsumerState<GalleryScreen> {
-
-  @override
-  Widget build(BuildContext context) {
-    final asyncAlbumList = 
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncAlbumList =
         ref.watch(galleryStateProvider.select((v) => v.albumList));
 
     return asyncAlbumList.when(
+      data: (albumList) => _Content(albumList: albumList),
       error: (err, stack) {
-        String? errMsg;
-        if (err is PlatformException) {
-          errMsg = err.code;
-        }
         return Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(errMsg ?? 'failed to get photo library'),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () async {
-                  final status = await Permission.storage.request();
-                  print(status);
-                  if (status.isPermanentlyDenied) {
-                    print(status);
-                    await openAppSettings();
-                  } else if (status.isGranted) {
-                    await ref.read(galleryStateProvider.notifier).init();
-                  }
-                }, 
-                child: const Text('Reload'),
-              ),
-            ],
-          )
-        );
+            child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(handleException(err)),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () async {
+                await ref.read(galleryStateProvider.notifier).retry();
+              },
+              child: const Text('Reload'),
+            ),
+          ],
+        ));
       },
       loading: () => const Center(
         child: CircularProgressIndicator(),
       ),
-      data: (albumList) => _Content(albumList: albumList),
     );
   }
 }
 
 class _Content extends ConsumerStatefulWidget {
-  const _Content({ 
+  const _Content({
     Key? key,
     required this.albumList,
   }) : super(key: key);
@@ -76,7 +72,6 @@ class _Content extends ConsumerStatefulWidget {
 }
 
 class __ContentState extends ConsumerState<_Content> {
-
   bool _isLoadingMore = false;
   Map<String, Uint8List> thumbCache = {};
 
@@ -91,7 +86,7 @@ class __ContentState extends ConsumerState<_Content> {
 
   Future<Uint8List?> _getThumb(List<AssetEntity> imageList, int index) async {
     if (thumbCache.length > 90) {
-    thumbCache.remove(thumbCache.keys.first);
+      thumbCache.remove(thumbCache.keys.first);
     }
     final imageId = imageList[index].id;
     if (thumbCache[imageId] == null) {
@@ -106,7 +101,7 @@ class __ContentState extends ConsumerState<_Content> {
 
   @override
   Widget build(BuildContext context) {
-    final imageList = 
+    final imageList =
         ref.watch(galleryStateProvider.select((v) => v.imageList)) ?? [];
 
     return NotificationListener<ScrollNotification>(
@@ -121,38 +116,40 @@ class __ContentState extends ConsumerState<_Content> {
       child: GridView.builder(
         itemCount: imageList.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, crossAxisSpacing: 4, mainAxisSpacing: 4,
-        ), 
+          crossAxisCount: 3,
+          crossAxisSpacing: 4,
+          mainAxisSpacing: 4,
+        ),
         itemBuilder: (context, index) {
           return FutureBuilder<Uint8List?>(
-            future: _getThumb(imageList, index),
-            builder: (context, snapshot) {
-              final uniqueTag = generateEditHeroTag('gallery-$index');
-              return snapshot.hasData
-                  ? GestureDetector(
-                      onTap: () async {
-                        final imageFile = await imageList[index].loadFile();
-                        if (imageFile != null) {
-                          await precacheImage(FileImage(imageFile), context);
-                          await Navigator.of(context).pushNamed(
-                            EditScreen.route, 
-                            arguments: EditProps(
-                              imageFile: imageFile, uniqueTag: uniqueTag,
-                            ),
-                          );
-                        }
-                      },
-                      child: Hero(
-                        tag: uniqueTag,
-                        child: Image.memory(
-                          snapshot.data!,
-                          fit: BoxFit.cover,
+              future: _getThumb(imageList, index),
+              builder: (context, snapshot) {
+                final uniqueTag = generateEditHeroTag('gallery-$index');
+                return snapshot.hasData
+                    ? GestureDetector(
+                        onTap: () async {
+                          final imageFile = await imageList[index].loadFile();
+                          if (imageFile != null) {
+                            await precacheImage(FileImage(imageFile), context);
+                            await Navigator.of(context).pushNamed(
+                              EditScreen.route,
+                              arguments: EditProps(
+                                imageFile: imageFile,
+                                uniqueTag: uniqueTag,
+                              ),
+                            );
+                          }
+                        },
+                        child: Hero(
+                          tag: uniqueTag,
+                          child: Image.memory(
+                            snapshot.data!,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                    )
-                  : Container();
-            }
-          );
+                      )
+                    : Container();
+              });
         },
       ),
     );

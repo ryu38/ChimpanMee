@@ -1,4 +1,4 @@
-import 'package:chimpanmee/Color.dart';
+import 'package:chimpanmee/color.dart';
 import 'package:flutter/material.dart';
 
 class LoadingScreen extends StatelessWidget {

@@ -30,7 +30,6 @@ class WebStateNotifier extends StateNotifier<WebState> {
   ));
 
   Future<void> loadImage(String url) async {
-    print('start loading image');
     state = state.copyWith(
       isLoading: true,
     );

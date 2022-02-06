@@ -49,20 +49,16 @@ class WebScreen extends ConsumerWidget {
                 filled: true,
                 fillColor: AppColors.milkCoffee,
                 suffixIcon: IconButton(
-                  onPressed: () {
-                    urlController.clear();
-                  },
+                  onPressed: urlController.clear,
                   icon: const Icon(Icons.clear),
                 ),
               ),
               onSubmitted: (inputUrl) async {
-                debugLog('on submit');
                 await notifier.loadImage(inputUrl);
               },
             ),
             TextButton(
               onPressed: () {
-                debugLog('sample typed');
                 urlController.text = sampleUrl;
                 notifier.loadImage(sampleUrl);
               }, 

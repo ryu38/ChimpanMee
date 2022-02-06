@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:chimpanmee/components/app_error.dart';
+
 /// Singleton class that is different by platform (android or ios)
 class MLConst {
 
@@ -18,7 +20,9 @@ class MLConst {
     } else if (Platform.isIOS) {
       instance = const MLConst._ios();
     } else {
-      throw Exception('the platform not supported; supporting ios or android');
+      throw AppException(
+        'the platform not supported; supporting ios or android'
+      );
     }
     return instance;
   }
