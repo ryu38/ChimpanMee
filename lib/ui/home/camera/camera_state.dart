@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:chimpanmee/components/app_error.dart';
 import 'package:chimpanmee/init_values.dart';
 import 'package:chimpanmee/main.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
@@ -45,6 +46,7 @@ class CameraStateNotifier extends StateNotifier<CameraState> {
       }
       final controller = _getCameraController(cameras[state.cameraId]);
       await controller.initialize();
+      await controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
       return controller;
     });
     final isCameraActive = controller.whenOrNull(data: (_) => true) ?? false;
