@@ -28,29 +28,68 @@ final lightTheme = ThemeData(
     shape: CircularNotchedRectangle(),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-    primary: AppColors.coffee,
-  )),
+    style: ElevatedButton.styleFrom(
+      primary: AppColors.coffee,
+    ),
+  ),
   textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-    primary: AppColors.coffee,
-  )),
+    style: TextButton.styleFrom(
+      primary: AppColors.coffee,
+    ),
+  ),
+  progressIndicatorTheme: const ProgressIndicatorThemeData(
+    color: AppColors.coffee,
+  ),
 );
 
-final darkTheme = lightTheme.copyWith(
+final darkTheme = ThemeData.dark().copyWith(
   brightness: Brightness.dark,
+  primaryColor: AppColors.ripeBanana,
+  scaffoldBackgroundColor: AppColors.blackCoffee,
+  appBarTheme: lightTheme.appBarTheme.copyWith(
+    systemOverlayStyle: const SystemUiOverlayStyle(
+      statusBarColor: AppColors.blackCoffee,
+      statusBarBrightness: Brightness.dark, //IOS
+      statusBarIconBrightness: Brightness.light, //Android
+    ),
+    backgroundColor: AppColors.blackCoffee,
+    foregroundColor: AppColors.white,
+  ),
+  floatingActionButtonTheme: lightTheme.floatingActionButtonTheme.copyWith(
+    backgroundColor: AppColors.ripeBanana,
+  ),
+  bottomAppBarTheme: lightTheme.bottomAppBarTheme.copyWith(
+    color: AppColors.darkCoffee,
+  ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      primary: AppColors.ripeBanana,
+      onPrimary: Colors.black,
+    ),
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(
+      primary: AppColors.ripeBanana,
+    ),
+  ),
+  progressIndicatorTheme: const ProgressIndicatorThemeData(
+    color: AppColors.ripeBanana,
+  ),
 );
 
 extension ColorSchemeExt on ColorScheme {
   Color get secondaryButtonPrimary => _setColor(
-    light: AppColors.milkCoffee,
+    light: AppColors.banana,
+    dark: AppColors.darkCoffee,
   );
   Color get secondaryButtonText => _setColor(
     light: Colors.brown,
+    dark: Colors.yellow,
   );
 
   Color get navButtonColor => _setColor(
     light: Colors.brown,
+    dark: Colors.yellow,
   );
 
   Color _setColor({
