@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:chimpanmee/color.dart';
 import 'package:chimpanmee/components/app_error.dart';
 import 'package:chimpanmee/components/square_image.dart';
 import 'package:chimpanmee/components/toast.dart';
+import 'package:chimpanmee/theme/color.dart';
+import 'package:chimpanmee/theme/theme.dart';
 import 'package:chimpanmee/ui/home/home.dart';
 import 'package:chimpanmee/ui/home/preview/preview_state.dart';
 import 'package:chimpanmee/utlis/debug.dart';
-import 'package:chimpanmee/components/square_box.dart';
 import 'package:chimpanmee/utlis/file_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -135,23 +135,26 @@ class _PreviewMenu extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                  child: _MenuButton(
-                onPressed: () async {
-                  await _saveImage(ref.read);
-                },
-                icon: const Icon(Icons.download),
-                primary: const Color(0xffFFc800),
-                child: const Text('Download'),
-              )),
+                child: _MenuButton(
+                  onPressed: () async {
+                    await _saveImage(ref.read);
+                  },
+                  icon: Icons.download,
+                  text: 'Download',
+                  primary: Theme.of(context).colorScheme.secondaryButtonPrimary,
+                  textColor: Theme.of(context).colorScheme.secondaryButtonText,
+                ),
+              ),
               const SizedBox(width: 16),
               Expanded(
-                  child: _MenuButton(
-                onPressed: () async {
-                  await _shareImage(ref.read);
-                },
-                icon: const Icon(Icons.share),
-                child: const Text('Share'),
-              )),
+                child: _MenuButton(
+                  onPressed: () async {
+                    await _shareImage(ref.read);
+                  },
+                  icon: Icons.share,
+                  text: 'Share',
+                ),
+              ),
             ],
           ),
         ],
@@ -180,7 +183,7 @@ class _ImageSwitcher extends ConsumerWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(_cornerRadius),
-          color: AppColors.milkCoffee,
+          color: Theme.of(context).bottomAppBarTheme.color,
         ),
         child: Row(
           children: [
@@ -223,15 +226,17 @@ class _MenuButton extends StatelessWidget {
     Key? key,
     required this.onPressed,
     required this.icon,
-    required this.child,
+    required this.text,
     this.primary,
+    this.textColor,
   }) : super(key: key);
 
   final void Function()? onPressed;
-  final Icon icon;
-  final Widget child;
+  final IconData icon;
+  final String text;
 
   final Color? primary;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -248,9 +253,14 @@ class _MenuButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          icon,
+          Icon(icon, color: textColor),
           const SizedBox(width: 8),
-          child,
+          Text(
+            text, 
+            style: TextStyle(
+              color: textColor,
+            ),
+          ),
         ],
       ),
     );

@@ -9,6 +9,7 @@ import 'package:chimpanmee/ui/home/web/web.dart';
 import 'package:chimpanmee/ui/home/web/web_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:chimpanmee/theme/theme.dart';
 
 class HomeScaff extends ConsumerStatefulWidget {
   const HomeScaff({Key? key, required this.title}) : super(key: key);
@@ -34,7 +35,7 @@ class _HomeScaffState extends ConsumerState<HomeScaff> {
   }) {
     final currentPage = ref.read(homeStateProvider).currentPage;
     final isPageMatch = currentPage == targetPage;
-    final activeColor = Theme.of(this.context).primaryColor;
+    final activeColor = Theme.of(context).colorScheme.navButtonColor;
     final widgetList = [
       Icon(
         isPageMatch ? activeIcon : defaultIcon,
@@ -65,8 +66,8 @@ class _HomeScaffState extends ConsumerState<HomeScaff> {
   Future<void> _fabAction(Reader read) async {
     final currentPage = read(homeStateProvider).currentPage;
     if (currentPage == AppPage.camera) {
-      read(cameraStateProvider).controller.whenData((value) async => 
-          read(cameraStateProvider.notifier).switchCamera());
+      read(cameraStateProvider).controller.whenData(
+          (value) async => read(cameraStateProvider.notifier).switchCamera());
     } else {
       homeNotifier.moveToPage(AppPage.camera);
     }
@@ -100,10 +101,11 @@ class _HomeScaffState extends ConsumerState<HomeScaff> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      extendBody: true, // transparent fab notch
       bottomNavigationBar: BottomAppBar(
         notchMargin: 12,
         child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 8),
+          margin: const EdgeInsets.symmetric(vertical: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [

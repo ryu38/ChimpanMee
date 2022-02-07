@@ -1,4 +1,4 @@
-import 'package:chimpanmee/color.dart';
+import 'package:chimpanmee/theme/color.dart';
 import 'package:flutter/material.dart';
 
 class LoadingScreen extends StatelessWidget {
@@ -13,7 +13,7 @@ class LoadingScreen extends StatelessWidget {
         child: Text(
           'ChimpanMee',
           style: TextStyle(
-            color: AppColors.coffee,
+            color: Theme.of(context).primaryColor,
             fontWeight: FontWeight.w700,
             fontSize: 24,
           ),

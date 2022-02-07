@@ -1,4 +1,4 @@
-import 'package:chimpanmee/color.dart';
+import 'package:chimpanmee/theme/color.dart';
 import 'package:chimpanmee/components/square_box.dart';
 import 'package:chimpanmee/ui/home/edit/edit.dart';
 import 'package:chimpanmee/ui/home/edit/edit_hero_tag.dart';
@@ -7,6 +7,7 @@ import 'package:chimpanmee/ui/home/web/web_state.dart';
 import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:chimpanmee/theme/theme.dart';
 
 class WebScreen extends ConsumerWidget {
   WebScreen({ Key? key }) : super(key: key);
@@ -47,7 +48,7 @@ class WebScreen extends ConsumerWidget {
                 ),
                 contentPadding: const EdgeInsets.only(left: 20, right: 4),
                 filled: true,
-                fillColor: AppColors.milkCoffee,
+                fillColor: Theme.of(context).bottomAppBarTheme.color,
                 suffixIcon: IconButton(
                   onPressed: urlController.clear,
                   icon: const Icon(Icons.clear),
@@ -64,7 +65,7 @@ class WebScreen extends ConsumerWidget {
               }, 
               child: const Text('Type sample link'),
             ),
-            const SizedBox(height: 24,),
+            const SizedBox(height: 24),
             if (imageFile != null) Hero(
               tag: uniqueTag,
               child: ClipRRect(
@@ -72,6 +73,7 @@ class WebScreen extends ConsumerWidget {
                 child: Image.memory(imageFile.readAsBytesSync()),
               ),
             ),
+            const SizedBox(height: 72),
           ],
         ),
       ),
