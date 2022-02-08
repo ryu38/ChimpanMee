@@ -84,6 +84,9 @@ class _CameraMain extends ConsumerWidget {
           ),
         ),
         const Spacer(),
+        const SizedBox(
+          height: kBottomNavigationBarHeight,
+        ),
       ],
     );
   }

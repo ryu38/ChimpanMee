@@ -7,6 +7,7 @@ import 'package:chimpanmee/ui/home/gallery/gallery_state.dart';
 import 'package:chimpanmee/ui/home/home_states/page_state.dart';
 import 'package:chimpanmee/ui/home/web/web.dart';
 import 'package:chimpanmee/ui/home/web/web_appbar.dart';
+import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chimpanmee/theme/theme.dart';
@@ -25,15 +26,148 @@ class HomeScaff extends ConsumerStatefulWidget {
 class _HomeScaffState extends ConsumerState<HomeScaff> {
   HomeStateNotifier get homeNotifier => ref.read(homeStateProvider.notifier);
 
-  GestureDetector _navButton({
-    required IconData defaultIcon,
-    required IconData activeIcon,
-    required String labelText,
-    required AppPage targetPage,
-    required void Function()? onPressed,
-    bool reverse = false,
-  }) {
-    final currentPage = ref.read(homeStateProvider).currentPage;
+  @override
+  Widget build(BuildContext context) {
+    final currentPage =
+        ref.watch(homeStateProvider.select((v) => v.currentPage));
+
+    return Scaffold(
+      appBar: currentPage.widgets.appBarGenerator(context, ref),
+      body: currentPage.widgets.body,
+      floatingActionButton: const _FAB(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      extendBody: true, // transparent fab notch
+      bottomNavigationBar: const _BottomBar(),
+    );
+  }
+}
+
+class _FAB extends ConsumerWidget {
+  const _FAB({Key? key}) : super(key: key);
+
+  Future<void> _fabAction(Reader read) async {
+    final currentPage = read(homeStateProvider).currentPage;
+    if (currentPage == AppPage.camera) {
+      read(cameraStateProvider).controller.whenData(
+          (value) async => read(cameraStateProvider.notifier).switchCamera());
+    } else {
+      read(homeStateProvider.notifier).moveToPage(AppPage.camera);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentPage =
+        ref.watch(homeStateProvider.select((v) => v.currentPage));
+    final isKeyboardClosed = MediaQuery.of(context).viewInsets.bottom == 0.0;
+    return Visibility(
+      visible: isKeyboardClosed,
+      child: SizedBox(
+        width: 72,
+        child: FittedBox(
+          child: FloatingActionButton(
+            onPressed: () async {
+              await _fabAction(ref.read);
+            },
+            child: currentPage != AppPage.camera
+                ? const Icon(Icons.photo_camera)
+                : const Icon(Icons.cached),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomBar extends ConsumerWidget {
+  const _BottomBar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = L10n.of(context)!;
+    final homeNotifier = ref.read(homeStateProvider.notifier);
+    return BottomAppBar(
+      notchMargin: 12,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: LayoutBuilder(builder: (context, constraint) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _NavButton(
+                      defaultIcon: Icons.photo_library_outlined,
+                      activeIcon: Icons.photo_library,
+                      labelText: l10n.navBarGallery,
+                      targetPage: AppPage.gallery,
+                      onPressed: () {
+                        homeNotifier.moveToPage(AppPage.gallery);
+                      },
+                      reverse: true,
+                      constraints: constraint,
+                    ),
+                  ],
+                );
+              }),
+            ),
+            const SizedBox(width: 72),
+            Expanded(
+              child: LayoutBuilder(builder: (context, constraint) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _NavButton(
+                      defaultIcon: Icons.public_outlined,
+                      activeIcon: Icons.public,
+                      labelText: l10n.navBarWeb,
+                      targetPage: AppPage.web,
+                      onPressed: () {
+                        homeNotifier.moveToPage(AppPage.web);
+                      },
+                      constraints: constraint,
+                    ),
+                  ],
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NavButton extends ConsumerWidget {
+  const _NavButton({
+    Key? key,
+    required this.defaultIcon,
+    required this.activeIcon,
+    required this.labelText,
+    required this.targetPage,
+    required this.onPressed,
+    this.reverse = false,
+    this.constraints,
+  }) : super(key: key);
+
+  final IconData defaultIcon;
+  final IconData activeIcon;
+  final String labelText;
+  final AppPage targetPage;
+  final void Function()? onPressed;
+  final bool reverse;
+  final BoxConstraints? constraints;
+
+  double get _padding => 16;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentPage =
+        ref.watch(homeStateProvider.select((v) => v.currentPage));
     final isPageMatch = currentPage == targetPage;
     final activeColor = Theme.of(context).colorScheme.navButtonColor;
     final widgetList = [
@@ -42,96 +176,30 @@ class _HomeScaffState extends ConsumerState<HomeScaff> {
         color: isPageMatch ? activeColor : null,
       ),
       const SizedBox(width: 4),
-      Text(
-        labelText,
-        style: TextStyle(
-          color: isPageMatch ? activeColor : null,
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
+      Flexible(
+        child: Text(
+          labelText,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: isPageMatch ? activeColor : null,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       )
     ];
+
     return GestureDetector(
       onTap: isPageMatch ? null : onPressed,
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.all(8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: reverse ? List.from(widgetList.reversed) : widgetList,
-        ),
-      ),
-    );
-  }
-
-  Future<void> _fabAction(Reader read) async {
-    final currentPage = read(homeStateProvider).currentPage;
-    if (currentPage == AppPage.camera) {
-      read(cameraStateProvider).controller.whenData(
-          (value) async => read(cameraStateProvider.notifier).switchCamera());
-    } else {
-      homeNotifier.moveToPage(AppPage.camera);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = L10n.of(context)!;
-    final currentPage =
-        ref.watch(homeStateProvider.select((v) => v.currentPage));
-
-    final isKeyboardClosed = MediaQuery.of(context).viewInsets.bottom == 0.0;
-
-    return Scaffold(
-      appBar: currentPage.widgets.appBarGenerator(context, ref),
-      body: currentPage.widgets.body,
-      floatingActionButton: Visibility(
-        visible: isKeyboardClosed,
+        padding: EdgeInsets.all(_padding),
         child: SizedBox(
-          width: 72,
-          child: FittedBox(
-            child: FloatingActionButton(
-              onPressed: () async {
-                await _fabAction(ref.read);
-              },
-              child: currentPage != AppPage.camera
-                  ? const Icon(Icons.photo_camera)
-                  : const Icon(Icons.rotate_90_degrees_ccw),
-            ),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      extendBody: true, // transparent fab notch
-      bottomNavigationBar: BottomAppBar(
-        notchMargin: 12,
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 12),
+          width:
+              constraints != null ? constraints!.maxWidth - _padding * 2 : null,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _navButton(
-                defaultIcon: Icons.insert_photo,
-                activeIcon: Icons.insert_photo_sharp,
-                labelText: l10n.navBarGallery,
-                targetPage: AppPage.gallery,
-                onPressed: () {
-                  homeNotifier.moveToPage(AppPage.gallery);
-                },
-                reverse: true,
-              ),
-              const SizedBox(width: 72),
-              _navButton(
-                defaultIcon: Icons.web,
-                activeIcon: Icons.web_sharp,
-                labelText: l10n.navBarWeb,
-                targetPage: AppPage.web,
-                onPressed: () {
-                  setState(() {
-                    homeNotifier.moveToPage(AppPage.web);
-                  });
-                },
-              ),
-            ],
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: reverse ? List.from(widgetList.reversed) : widgetList,
           ),
         ),
       ),

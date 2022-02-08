@@ -24,7 +24,7 @@ AppBar _webAppBarGenerator(BuildContext context, WidgetRef ref) {
         style: ElevatedButton.styleFrom(
           elevation: 0,
           minimumSize: Size.zero,
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(160),
           ),

@@ -46,6 +46,13 @@ class MyApp extends ConsumerWidget {
       },
       theme: lightTheme,
       darkTheme: darkTheme,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          textScaleFactor:
+              MediaQuery.of(context).textScaleFactor.clamp(0.5, 1.5),
+        ),
+        child: child!,
+      ),
       initialRoute: '/',
       routes: {
         HomeScaff.route: (_) => ref.watch(initStatusProvider).when(

@@ -59,7 +59,7 @@ class EditScreen extends ConsumerWidget {
           onPressed: () async {
             await _done(context, ref, props.imageFile.readAsBytesSync());
           },
-          child: const Icon(Icons.photo_filter),
+          child: const Icon(Icons.auto_awesome),
         ),
       ),
     );

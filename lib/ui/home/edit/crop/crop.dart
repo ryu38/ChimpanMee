@@ -43,10 +43,21 @@ class _CropScreenState extends State<CropScreen> {
       appBar: AppBar(
         title: const Text('Adjust Crop'),
         actions: [
-          TextButton(
-            onPressed: _crop,
-            child: const Text('Done'),
+          Align(
+            child: ElevatedButton(
+              onPressed: _crop,
+              child: const Text('Done'),
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                minimumSize: Size.zero,
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(160),
+                ),
+              ),
+            ),
           ),
+          const SizedBox(width: 12),
         ],
       ),
       body: _Content(

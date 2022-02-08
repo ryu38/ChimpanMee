@@ -127,7 +127,7 @@ class _PreviewMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
           const _ImageSwitcher(),
@@ -203,17 +203,37 @@ class _ImageSwitcher extends ConsumerWidget {
                 ),
               ),
             ),
-            const Spacer(),
-            const Icon(Icons.rotate_left),
-            const SizedBox(width: 8),
-            const Text(
-              'show original',
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.rotate_left),
+                  SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'show original',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const Spacer(),
+            // const Icon(Icons.rotate_left),
+            // const SizedBox(width: 8),
+            // const Expanded(
+            //   child: Text(
+            //     'show original',
+            //     overflow: TextOverflow.ellipsis,
+            //     style: TextStyle(
+            //       fontWeight: FontWeight.w500,
+            //       fontSize: 16,
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -248,17 +268,20 @@ class _MenuButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, color: textColor),
           const SizedBox(width: 8),
-          Text(
-            text, 
-            style: TextStyle(
-              color: textColor,
+          Flexible(
+            child: Text(
+              text, 
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: textColor,
+              ),
             ),
           ),
         ],
