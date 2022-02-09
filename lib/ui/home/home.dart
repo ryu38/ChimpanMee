@@ -94,46 +94,28 @@ class _BottomBar extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
-              child: LayoutBuilder(builder: (context, constraint) {
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _NavButton(
-                      defaultIcon: Icons.photo_library_outlined,
-                      activeIcon: Icons.photo_library,
-                      labelText: l10n.navBarGallery,
-                      targetPage: AppPage.gallery,
-                      onPressed: () {
-                        homeNotifier.moveToPage(AppPage.gallery);
-                      },
-                      reverse: true,
-                      constraints: constraint,
-                    ),
-                  ],
-                );
-              }),
+              child: _NavButton(
+                  defaultIcon: Icons.photo_library_outlined,
+                  activeIcon: Icons.photo_library,
+                  labelText: l10n.navBarGallery,
+                  targetPage: AppPage.gallery,
+                  onPressed: () {
+                    homeNotifier.moveToPage(AppPage.gallery);
+                  },
+                  reverse: true,
+                ),
             ),
             const SizedBox(width: 72),
             Expanded(
-              child: LayoutBuilder(builder: (context, constraint) {
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _NavButton(
-                      defaultIcon: Icons.public_outlined,
-                      activeIcon: Icons.public,
-                      labelText: l10n.navBarWeb,
-                      targetPage: AppPage.web,
-                      onPressed: () {
-                        homeNotifier.moveToPage(AppPage.web);
-                      },
-                      constraints: constraint,
-                    ),
-                  ],
-                );
-              }),
+              child: _NavButton(
+                  defaultIcon: Icons.public_outlined,
+                  activeIcon: Icons.public,
+                  labelText: l10n.navBarWeb,
+                  targetPage: AppPage.web,
+                  onPressed: () {
+                    homeNotifier.moveToPage(AppPage.web);
+                  },
+                ),
             ),
           ],
         ),
@@ -151,7 +133,6 @@ class _NavButton extends ConsumerWidget {
     required this.targetPage,
     required this.onPressed,
     this.reverse = false,
-    this.constraints,
   }) : super(key: key);
 
   final IconData defaultIcon;
@@ -160,7 +141,6 @@ class _NavButton extends ConsumerWidget {
   final AppPage targetPage;
   final void Function()? onPressed;
   final bool reverse;
-  final BoxConstraints? constraints;
 
   double get _padding => 16;
 
@@ -194,13 +174,9 @@ class _NavButton extends ConsumerWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: EdgeInsets.all(_padding),
-        child: SizedBox(
-          width:
-              constraints != null ? constraints!.maxWidth - _padding * 2 : null,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: reverse ? List.from(widgetList.reversed) : widgetList,
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: reverse ? List.from(widgetList.reversed) : widgetList,
         ),
       ),
     );
