@@ -21,6 +21,7 @@ final lightTheme = ThemeData(
   floatingActionButtonTheme: const FloatingActionButtonThemeData(
     backgroundColor: AppColors.coffee,
     elevation: 0,
+    highlightElevation: 0,
   ),
   bottomAppBarTheme: const BottomAppBarTheme(
     color: AppColors.banana,
@@ -30,15 +31,14 @@ final lightTheme = ThemeData(
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       primary: AppColors.coffee,
-    ),
+    ).merge(ButtonStyle(
+      elevation: MaterialStateProperty.all<double>(0),
+    )),
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
       primary: AppColors.coffee,
     ),
-  ),
-  progressIndicatorTheme: const ProgressIndicatorThemeData(
-    color: AppColors.coffee,
   ),
 );
 

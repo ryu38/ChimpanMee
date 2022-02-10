@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:chimpanmee/components/appbar_elevated_button.dart';
 import 'package:chimpanmee/components/toast.dart';
 import 'package:chimpanmee/ui/home/edit/edit.dart';
 import 'package:chimpanmee/ui/home/preview/preview.dart';
@@ -44,17 +45,9 @@ class _CropScreenState extends State<CropScreen> {
         title: const Text('Adjust Crop'),
         actions: [
           Align(
-            child: ElevatedButton(
+            child: AppBarElevatedButton(
               onPressed: _crop,
               child: const Text('Done'),
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                minimumSize: Size.zero,
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(160),
-                ),
-              ),
             ),
           ),
           const SizedBox(width: 12),

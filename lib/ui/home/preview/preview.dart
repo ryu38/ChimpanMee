@@ -176,14 +176,14 @@ class _ImageSwitcher extends ConsumerWidget {
     late final inputPath = ref.read(previewStateProvider).inputPath;
     late final outputPath = ref.read(previewStateProvider).outputPath!;
 
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         ref.read(previewStateProvider.notifier).switchImage();
       },
-      child: Container(
+      child: Ink(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(_cornerRadius),
           color: Theme.of(context).bottomAppBarTheme.color,
+          borderRadius: BorderRadius.circular(_cornerRadius),
         ),
         child: Row(
           children: [
@@ -222,18 +222,6 @@ class _ImageSwitcher extends ConsumerWidget {
                 ],
               ),
             ),
-            // const Icon(Icons.rotate_left),
-            // const SizedBox(width: 8),
-            // const Expanded(
-            //   child: Text(
-            //     'show original',
-            //     overflow: TextOverflow.ellipsis,
-            //     style: TextStyle(
-            //       fontWeight: FontWeight.w500,
-            //       fontSize: 16,
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -263,7 +251,6 @@ class _MenuButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        elevation: 0,
         primary: primary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),

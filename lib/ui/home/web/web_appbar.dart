@@ -1,3 +1,4 @@
+import 'package:chimpanmee/components/appbar_elevated_button.dart';
 import 'package:chimpanmee/ui/home/edit/edit.dart';
 import 'package:chimpanmee/ui/home/edit/edit_props.dart';
 import 'package:chimpanmee/ui/home/home.dart';
@@ -11,7 +12,7 @@ AppBar _webAppBarGenerator(BuildContext context, WidgetRef ref) {
       ref.watch(webStateProvider.select((v) => v.imageFile));
   final actions = <Widget>[
     if (imageFile != null) Align(
-      child: ElevatedButton(
+      child: AppBarElevatedButton(
         onPressed: () async {
           await precacheImage(FileImage(imageFile), context);
           await Navigator.of(context).pushNamed(
@@ -21,14 +22,6 @@ AppBar _webAppBarGenerator(BuildContext context, WidgetRef ref) {
             ),
           );
         },
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          minimumSize: Size.zero,
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(160),
-          ),
-        ),
         child: const Text('Next'),
       ),
     ),

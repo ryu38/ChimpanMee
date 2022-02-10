@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:chimpanmee/components/app_error.dart';
 import 'package:chimpanmee/init_values.dart';
 import 'package:chimpanmee/main.dart';
+import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -82,6 +83,7 @@ class CameraStateNotifier extends StateNotifier<CameraState> {
     state.controller.whenData((controller) {
       controller.dispose();
     });
+    debugLog('camera state dispose');
     super.dispose();
   }
 

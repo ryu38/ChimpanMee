@@ -30,7 +30,7 @@ class CameraScreen extends ConsumerWidget {
       data: (controller) => _CameraMain(controller: controller),
       error: (error, _) =>
           Center(child: Text(handleException(error))),
-      loading: () => const CircularProgressIndicator(),
+      loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
 }
@@ -79,7 +79,7 @@ class _CameraMain extends ConsumerWidget {
             ),
             child: const Icon(
               Icons.photo_camera,
-              size: 32,
+              size: 40,
             ),
           ),
         ),

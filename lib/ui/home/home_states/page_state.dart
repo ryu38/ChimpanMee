@@ -27,9 +27,6 @@ class HomeStateNotifier extends StateNotifier<HomeState> {
   final Reader read;
 
   void moveToPage(AppPage page) {
-    if (state.currentPage == AppPage.camera) {
-      read(cameraStateProvider.notifier).disposeCamera();
-    }
     state = state.copyWith(
       currentPage: page,
     );
