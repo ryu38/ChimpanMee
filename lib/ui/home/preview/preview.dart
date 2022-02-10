@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:chimpanmee/components/app_error.dart';
-import 'package:chimpanmee/components/square_image.dart';
+import 'package:chimpanmee/components/errors/app_exception.dart';
+import 'package:chimpanmee/components/widgets/square_image.dart';
 import 'package:chimpanmee/components/toast.dart';
 import 'package:chimpanmee/theme/color.dart';
 import 'package:chimpanmee/theme/theme.dart';

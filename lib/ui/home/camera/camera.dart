@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
-import 'package:chimpanmee/components/app_error.dart';
-import 'package:chimpanmee/components/square_box.dart';
+import 'package:chimpanmee/components/errors/app_exception.dart';
+import 'package:chimpanmee/components/widgets/square_box.dart';
 import 'package:chimpanmee/ui/home/camera/camera_state.dart';
 import 'package:chimpanmee/ui/home/preview/preview.dart';
 import 'package:flutter/material.dart';

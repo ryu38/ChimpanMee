@@ -1,4 +1,4 @@
-import 'package:chimpanmee/components/appbar_elevated_button.dart';
+import 'package:chimpanmee/components/widgets/appbar_elevated_button.dart';
 import 'package:chimpanmee/ui/home/edit/edit.dart';
 import 'package:chimpanmee/ui/home/edit/edit_props.dart';
 import 'package:chimpanmee/ui/home/home.dart';

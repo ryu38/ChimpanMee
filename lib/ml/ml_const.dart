@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chimpanmee/components/app_error.dart';
+import 'package:chimpanmee/components/errors/app_exception.dart';
 
 /// Singleton class that is different by platform (android or ios)
 class MLConst {

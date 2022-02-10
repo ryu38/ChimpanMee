@@ -1,5 +1,5 @@
 import 'package:camera/camera.dart';
-import 'package:chimpanmee/components/app_error.dart';
+import 'package:chimpanmee/components/errors/app_exception.dart';
 import 'package:chimpanmee/init_values.dart';
 import 'package:chimpanmee/main.dart';
 import 'package:chimpanmee/utlis/debug.dart';

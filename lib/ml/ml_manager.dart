@@ -1,4 +1,4 @@
-import 'package:chimpanmee/components/app_error.dart';
+import 'package:chimpanmee/components/errors/app_exception.dart';
 import 'package:chimpanmee/ml/ml_const.dart';
 import 'package:chimpanmee/utlis/file_utils.dart';
 import 'package:flutter/foundation.dart';

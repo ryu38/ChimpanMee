@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chimpanmee/components/app_error.dart';
+import 'package:chimpanmee/components/errors/app_exception.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class AppPermission {

@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
-import 'package:chimpanmee/components/app_error.dart';
+import 'package:chimpanmee/components/errors/app_exception.dart';
+import 'package:chimpanmee/components/errors/permission_denied.dart';
 import 'package:chimpanmee/components/toast.dart';
+import 'package:chimpanmee/platform_permission.dart';
 import 'package:chimpanmee/ui/home/edit/edit.dart';
 import 'package:chimpanmee/ui/home/edit/edit_hero_tag.dart';
 import 'package:chimpanmee/ui/home/edit/edit_props.dart';
@@ -14,8 +16,58 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-class GalleryScreen extends ConsumerWidget {
+class GalleryScreen extends ConsumerStatefulWidget {
   const GalleryScreen({Key? key}) : super(key: key);
+
+  @override
+  _GalleryScreenState createState() => _GalleryScreenState();
+}
+
+class _GalleryScreenState extends ConsumerState<GalleryScreen>
+    with WidgetsBindingObserver {
+  GalleryStateNotifier get notifier => ref.read(galleryStateProvider.notifier);
+
+  bool _openingSettings = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed && _openingSettings) {
+      debugLog('resumed');
+      ref.read(galleryStateProvider).albumList.whenOrNull(
+        error: (error, _) {
+          if (error is PermissionDeniedException) {
+            notifier.init();
+            _openingSettings = false;
+          }
+        },
+      );
+    }
+  }
+
+  Future<void> retry() async {
+    final status = await AppPermission().gallery.request();
+    debugLog(status.toString());
+    if (status.isPermanentlyDenied) {
+      await Future<void>.delayed(const Duration(microseconds: 1));
+      _openingSettings = true;
+      await openAppSettings();
+    } else {
+      await notifier.init();
+    }
+  }
 
   String handleException(Object err) {
     String? msg;
@@ -25,12 +77,14 @@ class GalleryScreen extends ConsumerWidget {
       msg = err.message;
     } else if (err is PlatformException) {
       msg = err.code;
+    } else if (err is PermissionDeniedException) {
+      msg = 'Permission Denied!';
     }
     return msg ?? 'failed to get photo library';
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final asyncAlbumList =
         ref.watch(galleryStateProvider.select((v) => v.albumList));
 
@@ -45,7 +99,7 @@ class GalleryScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             ElevatedButton(
               onPressed: () async {
-                await ref.read(galleryStateProvider.notifier).retry();
+                await retry();
               },
               child: const Text('Reload'),
             ),

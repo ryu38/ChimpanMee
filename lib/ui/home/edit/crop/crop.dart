@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:chimpanmee/components/appbar_elevated_button.dart';
+import 'package:chimpanmee/components/widgets/appbar_elevated_button.dart';
 import 'package:chimpanmee/components/toast.dart';
 import 'package:chimpanmee/ui/home/edit/edit.dart';
 import 'package:chimpanmee/ui/home/preview/preview.dart';

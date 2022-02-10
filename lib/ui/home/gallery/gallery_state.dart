@@ -1,4 +1,5 @@
-import 'package:chimpanmee/components/app_error.dart';
+import 'package:chimpanmee/components/errors/app_exception.dart';
+import 'package:chimpanmee/components/errors/permission_denied.dart';
 import 'package:chimpanmee/platform_permission.dart';
 import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/foundation.dart';
@@ -33,13 +34,14 @@ class GalleryStateNotifier extends StateNotifier<GalleryState> {
 
   Future<void> init() async {
     debugLog('Gallery init');
-    state.albumList.whenOrNull(loading: () {
-      state = state.copyWith(
-        albumList: const AsyncValue.loading(),
-      );
+    final albumList = await AsyncValue.guard(() async {
+      final status = await AppPermission().gallery.request();
+      debugLog(status);
+      if (status.isPermanentlyDenied || status.isDenied) {
+        throw PermissionDeniedException();
+      }
+      return PhotoManager.getAssetPathList(type: RequestType.image);
     });
-    final albumList = await AsyncValue.guard(
-        () => PhotoManager.getAssetPathList(type: RequestType.image));
     await albumList.maybeWhen(
       data: (v) async {
         if (v.isNotEmpty) {
@@ -55,9 +57,11 @@ class GalleryStateNotifier extends StateNotifier<GalleryState> {
         }
       },
       orElse: () {
-        state = state.copyWith(
-          albumList: albumList,
-        );
+        if (state.albumList != albumList) {
+          state = state.copyWith(
+            albumList: albumList,
+          );
+        }
       },
     );
   }
@@ -92,16 +96,5 @@ class GalleryStateNotifier extends StateNotifier<GalleryState> {
         );
       }
     });
-  }
-
-  Future<void> retry() async {
-    // final status = await Permission.storage.request();
-    final status = await AppPermission().gallery.request();
-    debugLog(status.toString());
-    if (status.isPermanentlyDenied) {
-      await openAppSettings();
-    } else if (status.isGranted) {
-      await init();
-    }
   }
 }

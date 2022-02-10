@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chimpanmee/components/square_box.dart';
+import 'package:chimpanmee/components/widgets/square_box.dart';
 import 'package:flutter/material.dart';
 
 class SquareImage extends StatelessWidget {
