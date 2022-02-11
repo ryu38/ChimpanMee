@@ -1,12 +1,16 @@
 import 'package:camera/camera.dart';
 import 'package:chimpanmee/components/errors/app_exception.dart';
+import 'package:chimpanmee/components/errors/permission_denied.dart';
 import 'package:chimpanmee/init_values.dart';
 import 'package:chimpanmee/main.dart';
+import 'package:chimpanmee/platform_permission.dart';
+import 'package:chimpanmee/ui/home/camera/camera_error.dart';
 import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 part 'camera_state.freezed.dart';
 
@@ -43,7 +47,11 @@ class CameraStateNotifier extends StateNotifier<CameraState> {
   Future<void> initialize() async {
     final controller = await AsyncValue.guard(() async {
       if (cameras.isEmpty) {
-        throw AppException('No cameras are available');
+        throw NoCamerasException();
+      }
+      final status = await AppPermission().camera.request();
+      if (status.isPermanentlyDenied || status.isDenied) {
+        throw PermissionDeniedException();
       }
       final controller = _getCameraController(cameras[state.cameraId]);
       await controller.initialize();

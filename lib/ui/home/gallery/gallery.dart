@@ -3,10 +3,12 @@ import 'dart:typed_data';
 import 'package:chimpanmee/components/errors/app_exception.dart';
 import 'package:chimpanmee/components/errors/permission_denied.dart';
 import 'package:chimpanmee/components/toast.dart';
+import 'package:chimpanmee/components/widgets/error_display.dart';
 import 'package:chimpanmee/platform_permission.dart';
 import 'package:chimpanmee/ui/home/edit/edit.dart';
 import 'package:chimpanmee/ui/home/edit/edit_hero_tag.dart';
 import 'package:chimpanmee/ui/home/edit/edit_props.dart';
+import 'package:chimpanmee/ui/home/gallery/gallery_error.dart';
 import 'package:chimpanmee/ui/home/gallery/gallery_state.dart';
 import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/foundation.dart';
@@ -32,12 +34,12 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
@@ -58,9 +60,9 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen>
   }
 
   Future<void> retry() async {
-    final status = await AppPermission().gallery.request();
+    final status = await AppPermission().gallery.status;
     debugLog(status.toString());
-    if (status.isPermanentlyDenied) {
+    if (status.isPermanentlyDenied || status.isDenied) {
       await Future<void>.delayed(const Duration(microseconds: 1));
       _openingSettings = true;
       await openAppSettings();
@@ -69,18 +71,36 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen>
     }
   }
 
-  String handleException(Object err) {
+  ErrorDisplay handleException(Object err) {
     String? msg;
     if (err is Error) throw err;
 
-    if (err is AppException) {
-      msg = err.message;
-    } else if (err is PlatformException) {
-      msg = err.code;
-    } else if (err is PermissionDeniedException) {
-      msg = 'Permission Denied!';
+    if (err is PermissionDeniedException) {
+      return ErrorDisplay(
+        headline: 'Permission Denied',
+        description: '''
+The app could not access your photo library.
+If you want to use photos from library, 
+please open settings and change media permission to "allowed".
+''',
+        solveButtonText: 'Open Settings',
+        solveFunc: retry,
+      );
+    } else if (err is GalleryEmptyException) {
+      return ErrorDisplay(
+        headline: 'Photos Not Found',
+        description: '''
+The app could not find photos in your library.
+If you added after this, please try to reload.
+''',
+        solveButtonText: 'Reload',
+        solveFunc: notifier.init,
+      );
     }
-    return msg ?? 'failed to get photo library';
+    return ErrorDisplay(
+      solveButtonText: 'Reload',
+      solveFunc: notifier.init,
+    );
   }
 
   @override
@@ -90,22 +110,13 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen>
 
     return asyncAlbumList.when(
       data: (albumList) => _Content(albumList: albumList),
-      error: (err, stack) {
-        return Center(
-            child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(handleException(err)),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () async {
-                await retry();
-              },
-              child: const Text('Reload'),
-            ),
-          ],
-        ));
-      },
+      error: (err, stack) => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          handleException(err),
+          const SizedBox(height: kBottomNavigationBarHeight),
+        ],
+      ),
       loading: () => const Center(
         child: CircularProgressIndicator(),
       ),
@@ -153,6 +164,20 @@ class __ContentState extends ConsumerState<_Content> {
     return thumbCache[imageId];
   }
 
+  Future<void> _openSelected(AssetEntity assetEntity, String uniqueTag) async {
+    final imageFile = await assetEntity.loadFile();
+    if (imageFile != null) {
+      await precacheImage(FileImage(imageFile), context);
+      await Navigator.of(context).pushNamed(
+        EditScreen.route,
+        arguments: EditProps(
+          imageFile: imageFile,
+          uniqueTag: uniqueTag,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final imageList =
@@ -181,18 +206,8 @@ class __ContentState extends ConsumerState<_Content> {
                 final uniqueTag = generateEditHeroTag('gallery-$index');
                 return snapshot.hasData
                     ? GestureDetector(
-                        onTap: () async {
-                          final imageFile = await imageList[index].loadFile();
-                          if (imageFile != null) {
-                            await precacheImage(FileImage(imageFile), context);
-                            await Navigator.of(context).pushNamed(
-                              EditScreen.route,
-                              arguments: EditProps(
-                                imageFile: imageFile,
-                                uniqueTag: uniqueTag,
-                              ),
-                            );
-                          }
+                        onTap: () {
+                          _openSelected(imageList[index], uniqueTag);
                         },
                         child: Hero(
                           tag: uniqueTag,

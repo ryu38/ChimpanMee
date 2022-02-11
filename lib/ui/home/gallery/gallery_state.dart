@@ -1,6 +1,7 @@
 import 'package:chimpanmee/components/errors/app_exception.dart';
 import 'package:chimpanmee/components/errors/permission_denied.dart';
 import 'package:chimpanmee/platform_permission.dart';
+import 'package:chimpanmee/ui/home/gallery/gallery_error.dart';
 import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,7 +53,7 @@ class GalleryStateNotifier extends StateNotifier<GalleryState> {
           );
         } else {
           state = state.copyWith(
-            albumList: AsyncValue.error(AppException('No Albums')),
+            albumList: AsyncValue.error(GalleryEmptyException()),
           );
         }
       },

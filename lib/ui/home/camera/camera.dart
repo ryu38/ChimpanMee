@@ -1,35 +1,113 @@
 import 'package:camera/camera.dart';
 import 'package:chimpanmee/components/errors/app_exception.dart';
+import 'package:chimpanmee/components/errors/permission_denied.dart';
+import 'package:chimpanmee/components/widgets/error_display.dart';
 import 'package:chimpanmee/components/widgets/square_box.dart';
+import 'package:chimpanmee/platform_permission.dart';
+import 'package:chimpanmee/ui/home/camera/camera_error.dart';
 import 'package:chimpanmee/ui/home/camera/camera_state.dart';
 import 'package:chimpanmee/ui/home/preview/preview.dart';
+import 'package:chimpanmee/utlis/debug.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-class CameraScreen extends ConsumerWidget {
-  const CameraScreen({
-    Key? key,
-  }) : super(key: key);
+class CameraScreen extends ConsumerStatefulWidget {
+  const CameraScreen({ Key? key }) : super(key: key);
 
-  String handleException(Object err) {
-    String? msg;
-    if (err is Error) throw err;
+  @override
+  _CameraScreenState createState() => _CameraScreenState();
+}
 
-    if (err is AppException) {
-      msg = err.message;
-    }
-    return msg ?? 'Error occurred while launching camera';
+class _CameraScreenState extends ConsumerState<CameraScreen> 
+    with WidgetsBindingObserver {
+  CameraStateNotifier get notifier => ref.read(cameraStateProvider.notifier);
+
+  bool _openingSettings = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addObserver(this);
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed && _openingSettings) {
+      debugLog('resumed');
+      ref.read(cameraStateProvider).controller.whenOrNull(
+        error: (error, _) {
+          if (error is PermissionDeniedException) {
+            notifier.initialize();
+            _openingSettings = false;
+          }
+        },
+      );
+    }
+  }
+
+  Future<void> retry() async {
+    final status = await AppPermission().camera.status;
+    debugLog(status.toString());
+    if (status.isPermanentlyDenied || status.isDenied) {
+      await Future<void>.delayed(const Duration(microseconds: 1));
+      _openingSettings = true;
+      await openAppSettings();
+    } else {
+      await notifier.initialize();
+    }
+  }
+
+  ErrorDisplay handleException(Object err) {
+    String? msg;
+    if (err is Error) throw err;
+
+    if (err is PermissionDeniedException) {
+      return ErrorDisplay(
+        headline: 'Permission Denied',
+        description: '''
+The app could not access camera.
+If you want to use camera, 
+please open settings and change camera permission to "allowed".
+''',
+        solveButtonText: 'Open Settings',
+        solveFunc: retry,
+      );
+    } else if (err is NoCamerasException) {
+      return const ErrorDisplay(
+        headline: 'Camera Not Available',
+        description: '''
+The app could not access camera.
+''',
+      );
+    }
+    return ErrorDisplay(
+      solveButtonText: 'Reload',
+      solveFunc: notifier.initialize,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final asyncController =
         ref.watch(cameraStateProvider.select((v) => v.controller));
     return asyncController.when(
       data: (controller) => _CameraMain(controller: controller),
-      error: (error, _) =>
-          Center(child: Text(handleException(error))),
+      error: (error, _) => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          handleException(error),
+          const SizedBox(height: kBottomNavigationBarHeight),
+        ],
+      ),
       loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
