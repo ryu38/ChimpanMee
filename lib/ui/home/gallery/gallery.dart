@@ -17,6 +17,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:chimpanmee/l10n/l10n.dart';
 
 class GalleryScreen extends ConsumerStatefulWidget {
   const GalleryScreen({Key? key}) : super(key: key);
@@ -71,29 +72,24 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen>
     }
   }
 
-  ErrorDisplay handleException(Object err) {
+  ErrorDisplay handleException(BuildContext context, Object err) {
     String? msg;
     if (err is Error) throw err;
 
+    final l10n = L10n.of(context)!;
+
     if (err is PermissionDeniedException) {
       return ErrorDisplay(
-        headline: 'Permission Denied',
-        description: '''
-The app could not access your photo library.
-If you want to use photos from library, 
-please open settings and change media permission to "allowed".
-''',
-        solveButtonText: 'Open Settings',
+        headline: l10n.permissionErrorHead,
+        description: l10n.permissionGalleryErrorDescription,
+        solveButtonText: l10n.permissionErrorSolve,
         solveFunc: retry,
       );
     } else if (err is GalleryEmptyException) {
       return ErrorDisplay(
-        headline: 'Photos Not Found',
-        description: '''
-The app could not find photos in your library.
-If you added after this, please try to reload.
-''',
-        solveButtonText: 'Reload',
+        headline: l10n.noAlbumErrorHead,
+        description: l10n.noAlbumErrorDescription,
+        solveButtonText: l10n.noAlbumErrorSolve,
         solveFunc: notifier.init,
       );
     }
@@ -113,7 +109,7 @@ If you added after this, please try to reload.
       error: (err, stack) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          handleException(err),
+          handleException(context,err),
           const SizedBox(height: kBottomNavigationBarHeight),
         ],
       ),

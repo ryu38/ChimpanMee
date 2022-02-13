@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:chimpanmee/l10n/l10n.dart';
 import 'package:chimpanmee/theme/color.dart';
 import 'package:chimpanmee/ui/home/camera/camera.dart';
+import 'package:chimpanmee/ui/home/camera/camera_appbar.dart';
 import 'package:chimpanmee/ui/home/camera/camera_state.dart';
 import 'package:chimpanmee/ui/home/gallery/gallery.dart';
 import 'package:chimpanmee/ui/home/gallery/gallery_appbar.dart';
@@ -240,6 +241,7 @@ extension PageExt on AppPage {
   static final _widgets = <AppPage, PageWidgetData>{
     AppPage.camera: PageWidgetData(
       body: CameraScreen(),
+      appBarGenerator: cameraAppBarGenerator,
     ),
     AppPage.gallery: PageWidgetData(
       body: GalleryScreen(),

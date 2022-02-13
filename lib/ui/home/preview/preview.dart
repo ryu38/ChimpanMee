@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:chimpanmee/components/errors/app_exception.dart';
 import 'package:chimpanmee/components/widgets/square_image.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:chimpanmee/l10n/l10n.dart';
 
 class PreviewScreen extends StatelessWidget {
   const PreviewScreen({Key? key}) : super(key: key);
@@ -22,6 +24,8 @@ class PreviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inputPath = ModalRoute.of(context)!.settings.arguments! as String;
+
+    final l10n = L10n.of(context)!;
 
     return ProviderScope(
       overrides: [
@@ -35,7 +39,7 @@ class PreviewScreen extends StatelessWidget {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('show the result'),
+            title: Text(l10n.appBarPreview),
           ),
           body: _Content(),
         ),
@@ -66,6 +70,12 @@ class __ContentState extends ConsumerState<_Content> {
     transformImage();
   }
 
+  String waitingMessage(BuildContext context) {
+    final message = L10n.of(context)!.previewTransforming;
+    final icons = math.Random().nextBool() ? '👨 -> 🐵' : '👩 -> 🐵';
+    return '$message ...\n\n$icons';
+  }
+
   @override
   Widget build(BuildContext context) {
     late final isOutputShown =
@@ -84,11 +94,12 @@ class __ContentState extends ConsumerState<_Content> {
         outputPath != null
             ? _PreviewMenu()
             : Text(
-                'transforming now ...',
-                style: TextStyle(
+                waitingMessage(context),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
-                  color: Theme.of(context).primaryColor,
+                  // color: Theme.of(context).primaryColor,
                 ),
               ),
         const Spacer(),
@@ -126,6 +137,8 @@ class _PreviewMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = L10n.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -140,7 +153,7 @@ class _PreviewMenu extends ConsumerWidget {
                     await _saveImage(ref.read);
                   },
                   icon: Icons.download,
-                  text: 'Download',
+                  text: l10n.previewSave,
                   primary: Theme.of(context).colorScheme.secondaryButtonPrimary,
                   textColor: Theme.of(context).colorScheme.secondaryButtonText,
                 ),
@@ -152,7 +165,7 @@ class _PreviewMenu extends ConsumerWidget {
                     await _shareImage(ref.read);
                   },
                   icon: Icons.share,
-                  text: 'Share',
+                  text: l10n.previewShare,
                 ),
               ),
             ],
@@ -171,6 +184,8 @@ class _ImageSwitcher extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = L10n.of(context)!;
+
     final isOutputShown =
         ref.watch(previewStateProvider.select((v) => v.isOutputShown));
     late final inputPath = ref.read(previewStateProvider).inputPath;
@@ -206,14 +221,14 @@ class _ImageSwitcher extends ConsumerWidget {
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.rotate_left),
-                  SizedBox(width: 8),
+                children: [
+                  const Icon(Icons.compare_arrows),
+                  const SizedBox(width: 8),
                   Flexible(
                     child: Text(
-                      'show original',
+                      l10n.previewSwitchImage,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 16,
                       ),
@@ -264,7 +279,7 @@ class _MenuButton extends StatelessWidget {
           const SizedBox(width: 8),
           Flexible(
             child: Text(
-              text, 
+              text,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: textColor,

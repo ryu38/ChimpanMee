@@ -6,7 +6,51 @@
     "description": "The conventional newborn programmer greeting"
   },
   
-  "navBarCamera": "camera",
+  "appBarCamera": "Take Photo",
+
+  "appBarGallery": "Select Photos",
   "navBarGallery": "gallery",
-  "navBarWeb": "web"
+
+  "appBarWeb": "Load Image on the web",
+  "navBarWeb": "web",
+  "webNextButton": "Next",
+  "webTextFieldHint": "Enter image link",
+  "webSampleImage": "Sample Image",
+
+  "appBarEdit": "Preview",
+
+  "appBarCrop": "Adjust Cropping Range",
+  "cropDoneButton": "Done",
+
+  "appBarPreview": "Result",
+  "previewTransforming": "Transforming",
+  "previewSwitchImage": "Switch Images",
+  "previewSave": "Save",
+  "previewShare": "Share",
+
+  "defaultErrorHead": "Error Occurred",
+  "defaultErrorDescription": "Something is wrong with the app.\nPlease reopen this screen or restart the app.",
+  "errorReloadSolve": "Reload",
+
+  "noCamerasErrorHead": "Camera Not Available",
+  "noCamerasErrorDescription": "The app could not access camera",
+
+  "permissionErrorHead": "Permission Denied",
+  "permissionGalleryErrorDescription": "The app could not access your photo library.\nIf you want to use photos from library, please open settings and change media permission to \"allowed\".",
+  "permissionCameraErrorDescription": "The app could not access camera.\nIf you want to use camera, please open settings and change camera permission to \"allowed\".",
+  "permissionErrorSolve": "Open Settings",
+
+  "noAlbumErrorHead": "Photos Not Found",
+  "noAlbumErrorDescription": "The app could not find photos in your library.\nIf you added after this, please try to reload.",
+  "noAlbumErrorSolve": "Reload",
+
+  "webFormatError": "Invalid URL",
+  "webNetworkImageErrorBadStatus": "Failed to access URL",
+  "webNetworkImageErrorNotImage": "Not image link",
+  "webNetworkImageErrorSocket": "Failed to access URL",
+  "webNetworkImageErrorOther": "Failed to access URL",
+  "webOtherError": "Error occurred",
+
+  "initErrorHead": "Error",
+  "initErrorDescription": "The app could not be launched due to an initialization error.\n\nPlease try to restart the app."
 }

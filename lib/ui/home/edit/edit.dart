@@ -8,23 +8,25 @@ import 'package:chimpanmee/ui/home/preview/preview.dart';
 import 'package:chimpanmee/utlis/file_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:chimpanmee/l10n/l10n.dart';
 
 class EditScreen extends ConsumerWidget {
-  const EditScreen({ 
+  const EditScreen({
     Key? key,
   }) : super(key: key);
 
   static const route = 'edit';
 
   Future<void> _done(
-    BuildContext context, WidgetRef ref, Uint8List image,
+    BuildContext context,
+    WidgetRef ref,
+    Uint8List image,
   ) async {
     final inputPath = await joinPathToCache('input.jpg');
     try {
       File(inputPath).writeAsBytesSync(image);
-      await Navigator.of(context).pushNamed(
-        PreviewScreen.route, arguments: inputPath
-      );
+      await Navigator.of(context)
+          .pushNamed(PreviewScreen.route, arguments: inputPath);
     } on Exception {
       await showToast('Failed to save the image');
     }
@@ -32,22 +34,23 @@ class EditScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     final props = ModalRoute.of(context)!.settings.arguments! as EditProps;
+
+    final l10n = L10n.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit'),
+        title: Text(l10n.appBarEdit),
         actions: [
           IconButton(
-            onPressed: () {}, 
+            onPressed: () {},
             icon: const Icon(Icons.help_outline),
           ),
           IconButton(
             onPressed: () async {
-              await Navigator.of(context).pushNamed(
-                  CropScreen.route, arguments: props.imageFile);
-            }, 
+              await Navigator.of(context)
+                  .pushNamed(CropScreen.route, arguments: props.imageFile);
+            },
             icon: const Icon(Icons.crop),
           ),
         ],
@@ -67,7 +70,7 @@ class EditScreen extends ConsumerWidget {
 }
 
 class _Content extends ConsumerWidget {
-  const _Content({ 
+  const _Content({
     Key? key,
     required this.props,
   }) : super(key: key);
@@ -86,10 +89,7 @@ class _Content extends ConsumerWidget {
 }
 
 class _SrcPreview extends ConsumerWidget {
-  const _SrcPreview({ 
-    Key? key,
-    required this.props
-  }) : super(key: key);
+  const _SrcPreview({Key? key, required this.props}) : super(key: key);
 
   final EditProps props;
 
@@ -104,7 +104,8 @@ class _SrcPreview extends ConsumerWidget {
         Positioned.fill(
           child: ColorFiltered(
             colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.5), BlendMode.srcOut,
+              Colors.black.withOpacity(0.5),
+              BlendMode.srcOut,
             ),
             child: Stack(
               children: [
@@ -113,22 +114,20 @@ class _SrcPreview extends ConsumerWidget {
                     color: Colors.transparent,
                   ),
                 ),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isVertical = 
-                        constraints.maxWidth < constraints.maxHeight;
-                    return Align(
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: Container(
+                LayoutBuilder(builder: (context, constraints) {
+                  final isVertical =
+                      constraints.maxWidth < constraints.maxHeight;
+                  return Align(
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Container(
                           width: isVertical ? double.infinity : null,
                           height: isVertical ? null : double.infinity,
                           color: Colors.red // any colors without transparent,
-                        ),
-                      ),
-                    );
-                  }
-                ),
+                          ),
+                    ),
+                  );
+                }),
               ],
             ),
           ),

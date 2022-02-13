@@ -6,29 +6,32 @@ import 'package:chimpanmee/ui/home/web/web.dart';
 import 'package:chimpanmee/ui/home/web/web_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:chimpanmee/l10n/l10n.dart';
 
 AppBar _webAppBarGenerator(BuildContext context, WidgetRef ref) {
-  final imageFile = 
-      ref.watch(webStateProvider.select((v) => v.imageFile));
+  final l10n = L10n.of(context)!;
+  final imageFile = ref.watch(webStateProvider.select((v) => v.imageFile));
   final actions = <Widget>[
-    if (imageFile != null) Align(
-      child: AppBarElevatedButton(
-        onPressed: () async {
-          await precacheImage(FileImage(imageFile), context);
-          await Navigator.of(context).pushNamed(
-            EditScreen.route, 
-            arguments: EditProps(
-              imageFile: imageFile, uniqueTag: WebScreen.uniqueTag,
-            ),
-          );
-        },
-        child: const Text('Next'),
+    if (imageFile != null)
+      Align(
+        child: AppBarElevatedButton(
+          onPressed: () async {
+            await precacheImage(FileImage(imageFile), context);
+            await Navigator.of(context).pushNamed(
+              EditScreen.route,
+              arguments: EditProps(
+                imageFile: imageFile,
+                uniqueTag: WebScreen.uniqueTag,
+              ),
+            );
+          },
+          child: Text(l10n.webNextButton),
+        ),
       ),
-    ),
     const SizedBox(width: 12),
   ];
   return AppBar(
-    title: const Text('Load Image Link'),
+    title: Text(l10n.appBarWeb),
     actions: actions,
   );
 }

@@ -12,15 +12,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:chimpanmee/l10n/l10n.dart';
 
 class CameraScreen extends ConsumerStatefulWidget {
-  const CameraScreen({ Key? key }) : super(key: key);
+  const CameraScreen({Key? key}) : super(key: key);
 
   @override
   _CameraScreenState createState() => _CameraScreenState();
 }
 
-class _CameraScreenState extends ConsumerState<CameraScreen> 
+class _CameraScreenState extends ConsumerState<CameraScreen>
     with WidgetsBindingObserver {
   CameraStateNotifier get notifier => ref.read(cameraStateProvider.notifier);
 
@@ -66,27 +67,23 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
     }
   }
 
-  ErrorDisplay handleException(Object err) {
+  ErrorDisplay handleException(BuildContext context, Object err) {
     String? msg;
     if (err is Error) throw err;
 
+    final l10n = L10n.of(context)!;
+
     if (err is PermissionDeniedException) {
       return ErrorDisplay(
-        headline: 'Permission Denied',
-        description: '''
-The app could not access camera.
-If you want to use camera, 
-please open settings and change camera permission to "allowed".
-''',
-        solveButtonText: 'Open Settings',
+        headline: l10n.permissionErrorHead,
+        description: l10n.permissionCameraErrorDescription,
+        solveButtonText: l10n.permissionErrorSolve,
         solveFunc: retry,
       );
     } else if (err is NoCamerasException) {
-      return const ErrorDisplay(
-        headline: 'Camera Not Available',
-        description: '''
-The app could not access camera.
-''',
+      return ErrorDisplay(
+        headline: l10n.noCamerasErrorHead,
+        description: l10n.noCamerasErrorDescription,
       );
     }
     return ErrorDisplay(
@@ -104,7 +101,7 @@ The app could not access camera.
       error: (error, _) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          handleException(error),
+          handleException(context, error),
           const SizedBox(height: kBottomNavigationBarHeight),
         ],
       ),

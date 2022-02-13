@@ -10,6 +10,7 @@ import 'package:chimpanmee/utlis/file_utils.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:chimpanmee/l10n/l10n.dart';
 
 class CropScreen extends StatefulWidget {
   CropScreen({Key? key}) : super(key: key);
@@ -24,6 +25,7 @@ class CropScreen extends StatefulWidget {
 
 class _CropScreenState extends State<CropScreen> {
   bool _isReadyToCrop = false;
+
   void _notifyReady() {
     if (!_isReadyToCrop) {
       _isReadyToCrop = true;
@@ -40,14 +42,16 @@ class _CropScreenState extends State<CropScreen> {
   Widget build(BuildContext context) {
     final imageFile = ModalRoute.of(context)!.settings.arguments! as File;
 
+    final l10n = L10n.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Adjust Crop'),
+        title: Text(l10n.appBarCrop),
         actions: [
           Align(
             child: AppBarElevatedButton(
               onPressed: _crop,
-              child: const Text('Done'),
+              child: Text(l10n.cropDoneButton),
             ),
           ),
           const SizedBox(width: 12),

@@ -14,6 +14,12 @@ final lightTheme = ThemeData(
       statusBarBrightness: Brightness.light, //IOS
       statusBarIconBrightness: Brightness.dark, //Android
     ),
+    titleTextStyle: TextStyle(
+      color: AppColors.brightBlack,
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+    ),
+    centerTitle: false,
     backgroundColor: AppColors.milkBanana,
     foregroundColor: AppColors.brightBlack,
     elevation: 0,
@@ -51,6 +57,9 @@ final darkTheme = ThemeData.dark().copyWith(
       statusBarColor: AppColors.blackCoffee,
       statusBarBrightness: Brightness.dark, //IOS
       statusBarIconBrightness: Brightness.light, //Android
+    ),
+    titleTextStyle: lightTheme.appBarTheme.titleTextStyle?.copyWith(
+      color: AppColors.white,
     ),
     backgroundColor: AppColors.blackCoffee,
     foregroundColor: AppColors.white,

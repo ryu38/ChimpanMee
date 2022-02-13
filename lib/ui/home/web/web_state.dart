@@ -14,7 +14,7 @@ part 'web_state.freezed.dart';
 class WebState with _$WebState {
   factory WebState({
     File? imageFile,
-    String? errorMsg,
+    Exception? exception,
     required bool isLoading,
   }) = _WebState;
 }
@@ -42,22 +42,17 @@ class WebStateNotifier extends StateNotifier<WebState> {
           ..writeAsBytesSync(imageData);
       state = state.copyWith(
         imageFile: imageFile,
-        errorMsg: null,
+        exception: null,
         isLoading: false,
       );
-    } on FormatException catch (e) {
-      setErrorMsg(e.message);
-    } on NetworkImageException catch (e) {
-      setErrorMsg(e.message);
     } on Exception catch (e) {
-      debugLog(e.toString());
-      setErrorMsg('Error occurred');
+      setException(e);
     }
   }
 
-  void setErrorMsg(String msg) {
+  void setException(Exception e) {
     state = state.copyWith(
-      errorMsg: msg,
+      exception: e,
       isLoading: false,
     );
   }

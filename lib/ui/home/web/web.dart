@@ -5,9 +5,11 @@ import 'package:chimpanmee/ui/home/edit/edit_hero_tag.dart';
 import 'package:chimpanmee/ui/home/edit/edit_props.dart';
 import 'package:chimpanmee/ui/home/web/web_state.dart';
 import 'package:chimpanmee/utlis/debug.dart';
+import 'package:chimpanmee/utlis/http_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chimpanmee/theme/theme.dart';
+import 'package:chimpanmee/l10n/l10n.dart';
 
 class WebScreen extends ConsumerWidget {
   WebScreen({Key? key}) : super(key: key);
@@ -19,14 +21,30 @@ class WebScreen extends ConsumerWidget {
 
   final urlController = TextEditingController();
 
+  String? _handleException(BuildContext context, Exception? e) {
+    final l10n = L10n.of(context)!;
+    if (e is FormatException) {
+      return l10n.webFormatError;
+    } else if (e is NetworkImageException) {
+      if (e.errorType == NetworkImageExceptionType.notImage) {
+        return l10n.webNetworkImageErrorNotImage;
+      } else {
+        debugLog('${e.errorType}: ${e.message}');
+        return l10n.webNetworkImageErrorOther;
+      }
+    } else if (e is Exception) {
+      return l10n.webOtherError;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = L10n.of(context)!;
+
     final imageFile = ref.watch(webStateProvider.select((v) => v.imageFile));
-    final errorMsg = ref.watch(webStateProvider.select((v) => v.errorMsg));
+    final exception = ref.watch(webStateProvider.select((v) => v.exception));
 
     final notifier = ref.read(webStateProvider.notifier);
-
-    print(kBottomNavigationBarHeight);
 
     return SingleChildScrollView(
       child: Padding(
@@ -41,8 +59,8 @@ class WebScreen extends ConsumerWidget {
                 fontSize: 14,
               ),
               decoration: InputDecoration(
-                hintText: 'Type image link',
-                errorText: errorMsg,
+                hintText: l10n.webTextFieldHint,
+                errorText: _handleException(context, exception),
                 border: OutlineInputBorder(
                   borderSide: BorderSide.none,
                   borderRadius: BorderRadius.circular(160),
@@ -64,7 +82,7 @@ class WebScreen extends ConsumerWidget {
                 urlController.text = sampleUrl;
                 notifier.loadImage(sampleUrl);
               },
-              child: const Text('Type sample link'),
+              child: Text(l10n.webSampleImage),
             ),
             const SizedBox(height: 24),
             if (imageFile != null)
