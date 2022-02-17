@@ -90,7 +90,13 @@ class WebScreen extends ConsumerWidget {
                 tag: uniqueTag,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: Image.memory(imageFile.readAsBytesSync()),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Image.file(
+                      imageFile,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
               ),
             const SizedBox(height: kBottomNavigationBarHeight + 24),

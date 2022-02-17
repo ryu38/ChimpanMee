@@ -251,6 +251,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.3"
+  flutter_launcher_icons:
+    dependency: "direct dev"
+    description:
+      name: flutter_launcher_icons
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.9.2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -267,8 +274,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: develop
-      resolved-ref: "7055f56e6bbfa2902dc88fc4777657b0197abf16"
+      ref: master
+      resolved-ref: f32686f9818d22089c97c73ba42f264ba1e80f50
       url: "https://github.com/ryu38/flutter-ML-imageTransformation.git"
     source: git
     version: "0.0.1"

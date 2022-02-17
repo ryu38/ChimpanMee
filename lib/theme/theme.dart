@@ -8,6 +8,7 @@ final lightTheme = ThemeData(
   primaryColor: AppColors.coffee,
   primaryColorDark: Colors.brown,
   scaffoldBackgroundColor: AppColors.milkBanana,
+  cardColor: AppColors.milkBanana,
   appBarTheme: const AppBarTheme(
     systemOverlayStyle: SystemUiOverlayStyle(
       statusBarColor: AppColors.milkBanana,
@@ -52,6 +53,7 @@ final darkTheme = ThemeData.dark().copyWith(
   brightness: Brightness.dark,
   primaryColor: AppColors.ripeBanana,
   scaffoldBackgroundColor: AppColors.blackCoffee,
+  cardColor: AppColors.blackCoffee,
   appBarTheme: lightTheme.appBarTheme.copyWith(
     systemOverlayStyle: const SystemUiOverlayStyle(
       statusBarColor: AppColors.blackCoffee,

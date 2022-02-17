@@ -19,27 +19,38 @@ class WebState with _$WebState {
   }) = _WebState;
 }
 
-final webStateProvider = 
-    StateNotifierProvider<WebStateNotifier, WebState>(
-      (ref) => WebStateNotifier()
-    );
+final webStateProvider = StateNotifierProvider<WebStateNotifier, WebState>(
+    (ref) => WebStateNotifier());
 
 class WebStateNotifier extends StateNotifier<WebState> {
-  WebStateNotifier(): super(WebState(
-    isLoading: false,
-  ));
+  WebStateNotifier()
+      : super(WebState(
+          isLoading: false,
+        ));
+
+  final _cache = <String, String>{};
 
   Future<void> loadImage(String url) async {
     state = state.copyWith(
       isLoading: true,
     );
     try {
-      final parsedUrl = Uri.parse(url);
-      if (!parsedUrl.isAbsolute) throw FormatException('Invalid URL');
-      final imageData = await getNetworkImage(parsedUrl);
-      final savePath = await joinPathToCache('network.jpg');
-      final imageFile = File(savePath)
-          ..writeAsBytesSync(imageData);
+      final cachedFileName = _cache[url];
+      final File imageFile;
+      if (cachedFileName == null) {
+        final parsedUrl = Uri.parse(url);
+        if (!parsedUrl.isAbsolute) throw FormatException('Invalid URL');
+        final imageData = await getNetworkImage(parsedUrl);
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final imageFilename = 'network_$timestamp.jpg';
+        final savePath = await joinPathToCache(imageFilename);
+        imageFile = File(savePath)..writeAsBytesSync(imageData);
+        _cache[url] = imageFilename;
+      } else {
+        debugLog('cached');
+        final savePath = await joinPathToCache(cachedFileName);
+        imageFile = File(savePath);
+      }
       state = state.copyWith(
         imageFile: imageFile,
         exception: null,

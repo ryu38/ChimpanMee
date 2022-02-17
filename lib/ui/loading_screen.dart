@@ -14,6 +14,7 @@ class LoadingScreen extends StatelessWidget {
           'ChimpanMee',
           style: TextStyle(
             color: Theme.of(context).primaryColor,
+            fontFamily: 'Ubuntu',
             fontWeight: FontWeight.w700,
             fontSize: 24,
           ),

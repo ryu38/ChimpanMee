@@ -43,10 +43,6 @@ class EditScreen extends ConsumerWidget {
         title: Text(l10n.appBarEdit),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.help_outline),
-          ),
-          IconButton(
             onPressed: () async {
               await Navigator.of(context)
                   .pushNamed(CropScreen.route, arguments: props.imageFile);
@@ -62,7 +58,7 @@ class EditScreen extends ConsumerWidget {
           onPressed: () async {
             await _done(context, ref, props.imageFile.readAsBytesSync());
           },
-          child: const Icon(Icons.auto_awesome),
+          child: const Icon(Icons.face_retouching_natural, size: 32),
         ),
       ),
     );
@@ -97,9 +93,12 @@ class _SrcPreview extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Stack(
       children: [
-        Image.file(
-          props.imageFile,
-          fit: BoxFit.cover,
+        SizedBox(
+          width: double.infinity,
+          child: Image.file(
+            props.imageFile,
+            fit: BoxFit.cover,
+          ),
         ),
         Positioned.fill(
           child: ColorFiltered(

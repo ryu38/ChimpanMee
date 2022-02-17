@@ -110,7 +110,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
   }
 }
 
-class _CameraMain extends ConsumerWidget {
+class _CameraMain extends ConsumerStatefulWidget {
   const _CameraMain({
     Key? key,
     required this.controller,
@@ -118,33 +118,51 @@ class _CameraMain extends ConsumerWidget {
 
   final CameraController controller;
 
-  Future<String> takePhoto(CameraController controller) async {
+  @override
+  __CameraMainState createState() => __CameraMainState();
+}
+
+class __CameraMainState extends ConsumerState<_CameraMain> {
+  bool _takingPhoto = false;
+
+  Future<String> _takePhoto(CameraController controller) async {
     final imageXFile = await controller.takePicture();
     await FlutterExifRotation.rotateAndSaveImage(path: imageXFile.path);
     return imageXFile.path;
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final isCameraActive =
         ref.watch(cameraStateProvider.select((v) => v.isCameraActive));
     return Column(
       children: [
         isCameraActive
-            ? _CameraDisplayer(controller: controller)
+            ? _CameraDisplayer(controller: widget.controller)
             : const SquareBox(),
         const Spacer(),
         Center(
           child: ElevatedButton(
-            onPressed: () async {
-              final path = await takePhoto(controller);
-              await ref.read(cameraStateProvider.notifier).disposeCamera();
-              await Navigator.of(context).pushNamed(
-                PreviewScreen.route,
-                arguments: path,
-              );
-              await ref.read(cameraStateProvider.notifier).initialize();
-            },
+            onPressed: !_takingPhoto
+                ? () async {
+                    if (_takingPhoto) return;
+                    setState(() {
+                      _takingPhoto = true;
+                    });
+                    final path = await _takePhoto(widget.controller);
+                    await ref
+                        .read(cameraStateProvider.notifier)
+                        .disposeCamera();
+                    await Navigator.of(context).pushNamed(
+                      PreviewScreen.route,
+                      arguments: path,
+                    );
+                    await ref.read(cameraStateProvider.notifier).initialize();
+                    setState(() {
+                      _takingPhoto = false;
+                    });
+                  }
+                : null,
             style: ElevatedButton.styleFrom(
               shape: const CircleBorder(),
               padding: const EdgeInsets.all(20),

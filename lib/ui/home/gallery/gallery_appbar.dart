@@ -3,12 +3,26 @@ import 'package:chimpanmee/ui/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chimpanmee/l10n/l10n.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 AppBar _galleryAppBarGenerator(BuildContext context, WidgetRef ref) {
   final l10n = L10n.of(context)!;
+  final defaultActions = <Widget>[
+    IconButton(
+      onPressed: () async {
+        final info = await PackageInfo.fromPlatform();
+        showLicensePage(
+          context: context,
+          applicationName: info.appName,
+          applicationVersion: info.version,
+        );
+      },
+      icon: const Icon(Icons.info_outline),
+    ),
+  ];
   final albumId =
       ref.watch(galleryStateProvider.select((v) => v.currentAlbumId));
-  final actions =
+  final galleryActions =
       ref.watch(galleryStateProvider.select((v) => v.albumList)).whenOrNull(
             data: (albumList) => [
               PopupMenuButton<int>(
@@ -36,6 +50,7 @@ AppBar _galleryAppBarGenerator(BuildContext context, WidgetRef ref) {
               ),
             ],
           );
+  final actions = defaultActions..insertAll(0, galleryActions ?? []);
   return AppBar(
     title: Text(l10n.appBarGallery),
     actions: actions,
