@@ -51,6 +51,7 @@ final lightTheme = ThemeData(
 
 final darkTheme = ThemeData.dark().copyWith(
   brightness: Brightness.dark,
+  colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.yellow),
   primaryColor: AppColors.ripeBanana,
   scaffoldBackgroundColor: AppColors.blackCoffee,
   cardColor: AppColors.blackCoffee,
@@ -82,9 +83,6 @@ final darkTheme = ThemeData.dark().copyWith(
     style: TextButton.styleFrom(
       primary: AppColors.ripeBanana,
     ),
-  ),
-  progressIndicatorTheme: const ProgressIndicatorThemeData(
-    color: AppColors.ripeBanana,
   ),
 );
 
