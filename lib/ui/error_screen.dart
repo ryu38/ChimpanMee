@@ -13,11 +13,23 @@ class ErrorScreen extends StatelessWidget {
     // do not define scaffold as const: theme reflection will not work.
     // ignore: prefer_const_constructors
     return Scaffold(
-      body: Center(
-        child: ErrorDisplay(
-          headline: l10n.initErrorHead,
-          description: l10n.initErrorDescription,
-        ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: ErrorDisplay(
+                    headline: l10n.initErrorHead,
+                    description: l10n.initErrorDescription,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
       ),
     );
   }

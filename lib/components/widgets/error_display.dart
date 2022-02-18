@@ -35,6 +35,7 @@ class ErrorDisplay extends StatelessWidget {
             const SizedBox(height: 48),
             Text(
               headline ?? l10n.defaultErrorHead,
+              textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headline5,
             ),
             const SizedBox(height: 24),

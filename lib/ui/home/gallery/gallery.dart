@@ -106,12 +106,21 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen>
 
     return asyncAlbumList.when(
       data: (albumList) => _Content(albumList: albumList),
-      error: (err, stack) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          handleException(context,err),
-          const SizedBox(height: kBottomNavigationBarHeight),
-        ],
+      error: (err, stack) => LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  handleException(context, err),
+                  const SizedBox(height: kBottomNavigationBarHeight + 60),
+                ],
+              ),
+            ),
+          );
+        }
       ),
       loading: () => const Center(
         child: CircularProgressIndicator(),

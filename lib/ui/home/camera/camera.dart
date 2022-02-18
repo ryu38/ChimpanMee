@@ -98,12 +98,21 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
         ref.watch(cameraStateProvider.select((v) => v.controller));
     return asyncController.when(
       data: (controller) => _CameraMain(controller: controller),
-      error: (error, _) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          handleException(context, error),
-          const SizedBox(height: kBottomNavigationBarHeight),
-        ],
+      error: (error, _) => LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  handleException(context, error),
+                  const SizedBox(height: kBottomNavigationBarHeight + 60),
+                ],
+              ),
+            ),
+          );
+        }
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
     );
