@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:chimpanmee/components/toast.dart';
 import 'package:chimpanmee/utlis/debug.dart';
@@ -36,21 +37,31 @@ class WebStateNotifier extends StateNotifier<WebState> {
     );
     try {
       final cachedFileName = _cache[url];
-      final File imageFile;
+      final Uint8List imageData;
       if (cachedFileName == null) {
         final parsedUrl = Uri.parse(url);
         if (!parsedUrl.isAbsolute) throw FormatException('Invalid URL');
-        final imageData = await getNetworkImage(parsedUrl);
+        imageData = await getNetworkImage(parsedUrl);
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final imageFilename = 'network_$timestamp.jpg';
-        final savePath = await joinPathToCache(imageFilename);
-        imageFile = File(savePath)..writeAsBytesSync(imageData);
+        final cachePath = await joinPathToCache(imageFilename);
+        File(cachePath).writeAsBytesSync(imageData);
         _cache[url] = imageFilename;
       } else {
         debugLog('cached');
-        final savePath = await joinPathToCache(cachedFileName);
-        imageFile = File(savePath);
+        final cachePath = await joinPathToCache(cachedFileName);
+        try {
+          imageData = File(cachePath).readAsBytesSync();
+        } on FileSystemException {
+          debugLog('failed to get cached image');
+          debugLog('try to load image again');
+          _cache.remove(url);
+          await loadImage(url);
+          return;
+        }
       }
+      final savePath = await joinPathToAppDir('network.jpg');
+      final imageFile = File(savePath)..writeAsBytesSync(imageData);
       state = state.copyWith(
         imageFile: imageFile,
         exception: null,

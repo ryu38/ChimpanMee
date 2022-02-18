@@ -83,7 +83,7 @@ class _Content extends ConsumerWidget {
     WidgetRef ref,
     Uint8List image,
   ) async {
-    final inputPath = await joinPathToCache('input.jpg');
+    final inputPath = await joinPathToAppDir('input.jpg');
     try {
       File(inputPath).writeAsBytesSync(image);
       await Navigator.of(context)

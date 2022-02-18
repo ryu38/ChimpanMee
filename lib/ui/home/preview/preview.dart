@@ -108,10 +108,32 @@ class __ContentState extends ConsumerState<_Content> {
   }
 }
 
-class _PreviewMenu extends ConsumerWidget {
+class _PreviewMenu extends ConsumerStatefulWidget {
   const _PreviewMenu({Key? key}) : super(key: key);
 
+  @override
+  __PreviewMenuState createState() => __PreviewMenuState();
+}
+
+class __PreviewMenuState extends ConsumerState<_PreviewMenu> {
+  bool _isDownloading = false;
+  bool _openingShare = false;
+
   Future<void> _saveImage(Reader read) async {
+    setState(() {
+      _isDownloading = true;
+    });
+    var coolTimeEnded = false;
+    var downloadEnded = false;
+    // ignore: unawaited_futures
+    Future<void>.delayed(const Duration(seconds: 1)).then((_) {
+      coolTimeEnded = true;
+      if (downloadEnded) {
+        setState(() {
+          _isDownloading = false;
+        });
+      }
+    });
     try {
       final outputPath = read(previewStateProvider).outputPath!;
       final timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -121,22 +143,36 @@ class _PreviewMenu extends ConsumerWidget {
           await GallerySaver.saveImage(newPath, albumName: 'ChimpanMee');
       if (success == true) {
         await showToast('The new chimp is saved successfully');
-        return;
+      } else {
+        throw AppException('Gallery Saver failed');
       }
-      throw AppException('Gallery Saver failed');
     } on Exception catch (e) {
       debugLog(e.toString());
       await showToast('Failed to save in gallery');
+    } finally {
+      downloadEnded = true;
+      if (coolTimeEnded) {
+        setState(() {
+          _isDownloading = false;
+        });
+      }
     }
   }
 
   Future<void> _shareImage(Reader read) async {
+    setState(() {
+      _openingShare = true;
+    });
     final outputPath = read(previewStateProvider).outputPath!;
     await Share.shareFiles([outputPath]);
+    await Future<void>.delayed(const Duration(seconds: 2));
+    setState(() {
+      _openingShare = false;
+    });
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
 
     return Padding(
@@ -149,9 +185,11 @@ class _PreviewMenu extends ConsumerWidget {
             children: [
               Expanded(
                 child: _MenuButton(
-                  onPressed: () async {
-                    await _saveImage(ref.read);
-                  },
+                  onPressed: !_isDownloading
+                      ? () async {
+                          await _saveImage(ref.read);
+                        }
+                      : null,
                   icon: Icons.download,
                   text: l10n.previewSave,
                   primary: Theme.of(context).colorScheme.secondaryButtonPrimary,
@@ -161,9 +199,11 @@ class _PreviewMenu extends ConsumerWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: _MenuButton(
-                  onPressed: () async {
-                    await _shareImage(ref.read);
-                  },
+                  onPressed: !_openingShare
+                      ? () async {
+                          await _shareImage(ref.read);
+                        }
+                      : null,
                   icon: Icons.share,
                   text: l10n.previewShare,
                 ),

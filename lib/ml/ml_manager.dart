@@ -21,7 +21,7 @@ class MLManager {
   final String modelPath;
 
   Future<String> transformImage(String imagePath) async {
-    final outputPath = await joinPathToCache(MLConst().cacheOutputName);
+    final outputPath = await joinPathToAppDir(MLConst().cacheOutputName);
     final result = await MLImageTransformer.transformImage(
       imagePath: imagePath, outputPath: outputPath
     );
