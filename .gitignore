@@ -52,3 +52,5 @@ app.*.map.json
 
 assets/coreml_model
 assets/pytorch_model
+
+*.apks

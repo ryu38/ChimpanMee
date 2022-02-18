@@ -23,6 +23,16 @@
                 "--debug",
                 "--dart-define=FLAVOR=prod"
             ]
+        },
+        {
+            "name": "release prod",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "args": [
+                "--release",
+                "--dart-define=FLAVOR=prod"
+            ]
         }
     ]
 }
