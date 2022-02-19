@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:chimpanmee/components/toast.dart';
 import 'package:chimpanmee/ui/home/edit/crop/crop.dart';
 import 'package:chimpanmee/ui/home/edit/edit_props.dart';
 import 'package:chimpanmee/ui/home/preview/preview.dart';
+import 'package:chimpanmee/utlis/debug.dart';
 import 'package:chimpanmee/utlis/file_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,13 +95,17 @@ class _SrcPreview extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Stack(
       children: [
-        SizedBox(
-          width: double.infinity,
-          child: Image.file(
+        LayoutBuilder(builder: (context, constraints) {
+          final screenAspect = constraints.maxWidth / constraints.maxHeight;
+          final imageAspect = props.imageData.width / props.imageData.height;
+          final isImageWider = imageAspect > screenAspect;
+          return Image.file(
             props.imageFile,
-            fit: BoxFit.cover,
-          ),
-        ),
+            width: isImageWider ? double.infinity : null,
+            height: isImageWider ? null : double.infinity,
+            fit: BoxFit.contain,
+          );
+        }),
         Positioned.fill(
           child: ColorFiltered(
             colorFilter: ColorFilter.mode(

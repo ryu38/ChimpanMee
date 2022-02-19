@@ -11,17 +11,23 @@ import 'package:chimpanmee/l10n/l10n.dart';
 AppBar _webAppBarGenerator(BuildContext context, WidgetRef ref) {
   final l10n = L10n.of(context)!;
   final imageFile = ref.watch(webStateProvider.select((v) => v.imageFile));
+  final url = ref.watch(webStateProvider.select((v) => v.url));
   final actions = <Widget>[
     if (imageFile != null)
       Align(
         child: AppBarElevatedButton(
           onPressed: () async {
+            final imageData =
+                await decodeImageFromList(imageFile.readAsBytesSync());
+            imageCache?.clear();
+            imageCache?.clearLiveImages();
             await precacheImage(FileImage(imageFile), context);
             await Navigator.of(context).pushNamed(
               EditScreen.route,
               arguments: EditProps(
                 imageFile: imageFile,
                 uniqueTag: WebScreen.uniqueTag,
+                imageData: imageData,
               ),
             );
           },

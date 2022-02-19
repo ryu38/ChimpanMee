@@ -42,6 +42,7 @@ class WebScreen extends ConsumerWidget {
     final l10n = L10n.of(context)!;
 
     final imageFile = ref.watch(webStateProvider.select((v) => v.imageFile));
+    final url = ref.watch(webStateProvider.select((v) => v.url));
     final exception = ref.watch(webStateProvider.select((v) => v.exception));
 
     final notifier = ref.read(webStateProvider.notifier);
@@ -92,14 +93,14 @@ class WebScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   child: SizedBox(
                     width: double.infinity,
-                    child: Image.file(
-                      imageFile,
+                    child: Image.memory(
+                      imageFile.readAsBytesSync(),
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
               ),
-            const SizedBox(height: kBottomNavigationBarHeight + 24),
+            const SizedBox(height: kBottomNavigationBarHeight + 60),
           ],
         ),
       ),

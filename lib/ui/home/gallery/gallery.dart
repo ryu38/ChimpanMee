@@ -106,22 +106,20 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen>
 
     return asyncAlbumList.when(
       data: (albumList) => _Content(albumList: albumList),
-      error: (err, stack) => LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  handleException(context, err),
-                  const SizedBox(height: kBottomNavigationBarHeight + 60),
-                ],
-              ),
+      error: (err, stack) => LayoutBuilder(builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                handleException(context, err),
+                const SizedBox(height: kBottomNavigationBarHeight + 60),
+              ],
             ),
-          );
-        }
-      ),
+          ),
+        );
+      }),
       loading: () => const Center(
         child: CircularProgressIndicator(),
       ),
@@ -172,12 +170,14 @@ class __ContentState extends ConsumerState<_Content> {
   Future<void> _openSelected(AssetEntity assetEntity, String uniqueTag) async {
     final imageFile = await assetEntity.loadFile();
     if (imageFile != null) {
+      final imageData = await decodeImageFromList(imageFile.readAsBytesSync());
       await precacheImage(FileImage(imageFile), context);
       await Navigator.of(context).pushNamed(
         EditScreen.route,
         arguments: EditProps(
           imageFile: imageFile,
           uniqueTag: uniqueTag,
+          imageData: imageData,
         ),
       );
     }

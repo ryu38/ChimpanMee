@@ -15,6 +15,7 @@ part 'web_state.freezed.dart';
 class WebState with _$WebState {
   factory WebState({
     File? imageFile,
+    String? url,
     Exception? exception,
     required bool isLoading,
   }) = _WebState;
@@ -64,6 +65,7 @@ class WebStateNotifier extends StateNotifier<WebState> {
       final imageFile = File(savePath)..writeAsBytesSync(imageData);
       state = state.copyWith(
         imageFile: imageFile,
+        url: url,
         exception: null,
         isLoading: false,
       );

@@ -19,9 +19,13 @@ class _$WebStateTearOff {
   const _$WebStateTearOff();
 
   _WebState call(
-      {File? imageFile, Exception? exception, required bool isLoading}) {
+      {File? imageFile,
+      String? url,
+      Exception? exception,
+      required bool isLoading}) {
     return _WebState(
       imageFile: imageFile,
+      url: url,
       exception: exception,
       isLoading: isLoading,
     );
@@ -34,6 +38,7 @@ const $WebState = _$WebStateTearOff();
 /// @nodoc
 mixin _$WebState {
   File? get imageFile => throw _privateConstructorUsedError;
+  String? get url => throw _privateConstructorUsedError;
   Exception? get exception => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
 
@@ -46,7 +51,8 @@ mixin _$WebState {
 abstract class $WebStateCopyWith<$Res> {
   factory $WebStateCopyWith(WebState value, $Res Function(WebState) then) =
       _$WebStateCopyWithImpl<$Res>;
-  $Res call({File? imageFile, Exception? exception, bool isLoading});
+  $Res call(
+      {File? imageFile, String? url, Exception? exception, bool isLoading});
 }
 
 /// @nodoc
@@ -60,6 +66,7 @@ class _$WebStateCopyWithImpl<$Res> implements $WebStateCopyWith<$Res> {
   @override
   $Res call({
     Object? imageFile = freezed,
+    Object? url = freezed,
     Object? exception = freezed,
     Object? isLoading = freezed,
   }) {
@@ -68,6 +75,10 @@ class _$WebStateCopyWithImpl<$Res> implements $WebStateCopyWith<$Res> {
           ? _value.imageFile
           : imageFile // ignore: cast_nullable_to_non_nullable
               as File?,
+      url: url == freezed
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String?,
       exception: exception == freezed
           ? _value.exception
           : exception // ignore: cast_nullable_to_non_nullable
@@ -85,7 +96,8 @@ abstract class _$WebStateCopyWith<$Res> implements $WebStateCopyWith<$Res> {
   factory _$WebStateCopyWith(_WebState value, $Res Function(_WebState) then) =
       __$WebStateCopyWithImpl<$Res>;
   @override
-  $Res call({File? imageFile, Exception? exception, bool isLoading});
+  $Res call(
+      {File? imageFile, String? url, Exception? exception, bool isLoading});
 }
 
 /// @nodoc
@@ -100,6 +112,7 @@ class __$WebStateCopyWithImpl<$Res> extends _$WebStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? imageFile = freezed,
+    Object? url = freezed,
     Object? exception = freezed,
     Object? isLoading = freezed,
   }) {
@@ -108,6 +121,10 @@ class __$WebStateCopyWithImpl<$Res> extends _$WebStateCopyWithImpl<$Res>
           ? _value.imageFile
           : imageFile // ignore: cast_nullable_to_non_nullable
               as File?,
+      url: url == freezed
+          ? _value.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as String?,
       exception: exception == freezed
           ? _value.exception
           : exception // ignore: cast_nullable_to_non_nullable
@@ -123,10 +140,13 @@ class __$WebStateCopyWithImpl<$Res> extends _$WebStateCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_WebState with DiagnosticableTreeMixin implements _WebState {
-  _$_WebState({this.imageFile, this.exception, required this.isLoading});
+  _$_WebState(
+      {this.imageFile, this.url, this.exception, required this.isLoading});
 
   @override
   final File? imageFile;
+  @override
+  final String? url;
   @override
   final Exception? exception;
   @override
@@ -134,7 +154,7 @@ class _$_WebState with DiagnosticableTreeMixin implements _WebState {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'WebState(imageFile: $imageFile, exception: $exception, isLoading: $isLoading)';
+    return 'WebState(imageFile: $imageFile, url: $url, exception: $exception, isLoading: $isLoading)';
   }
 
   @override
@@ -143,6 +163,7 @@ class _$_WebState with DiagnosticableTreeMixin implements _WebState {
     properties
       ..add(DiagnosticsProperty('type', 'WebState'))
       ..add(DiagnosticsProperty('imageFile', imageFile))
+      ..add(DiagnosticsProperty('url', url))
       ..add(DiagnosticsProperty('exception', exception))
       ..add(DiagnosticsProperty('isLoading', isLoading));
   }
@@ -153,6 +174,7 @@ class _$_WebState with DiagnosticableTreeMixin implements _WebState {
         (other.runtimeType == runtimeType &&
             other is _WebState &&
             const DeepCollectionEquality().equals(other.imageFile, imageFile) &&
+            const DeepCollectionEquality().equals(other.url, url) &&
             const DeepCollectionEquality().equals(other.exception, exception) &&
             const DeepCollectionEquality().equals(other.isLoading, isLoading));
   }
@@ -161,6 +183,7 @@ class _$_WebState with DiagnosticableTreeMixin implements _WebState {
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(imageFile),
+      const DeepCollectionEquality().hash(url),
       const DeepCollectionEquality().hash(exception),
       const DeepCollectionEquality().hash(isLoading));
 
@@ -173,11 +196,14 @@ class _$_WebState with DiagnosticableTreeMixin implements _WebState {
 abstract class _WebState implements WebState {
   factory _WebState(
       {File? imageFile,
+      String? url,
       Exception? exception,
       required bool isLoading}) = _$_WebState;
 
   @override
   File? get imageFile;
+  @override
+  String? get url;
   @override
   Exception? get exception;
   @override
