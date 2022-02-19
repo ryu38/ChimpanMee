@@ -85,26 +85,49 @@ class __ContentState extends ConsumerState<_Content> {
     late final outputPath =
         ref.watch(previewStateProvider.select((v) => v.outputPath));
 
-    return Column(
-      children: [
-        outputPath != null && isOutputShown
-            ? SquareImage(outputPath)
-            : SquareImage(inputPath),
-        const Spacer(),
-        outputPath != null
-            ? _PreviewMenu()
-            : Text(
-                waitingMessage(context),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  // color: Theme.of(context).primaryColor,
+    return LayoutBuilder(builder: (context, constraints) {
+      final lowerSpace = constraints.maxHeight - constraints.maxWidth;
+      return SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(
+              child: Container(
+                color: Theme.of(context).colorScheme.cameraMarginColor,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    outputPath != null && isOutputShown
+                        ? SquareImage(outputPath)
+                        : SquareImage(inputPath),
+                  ],
                 ),
               ),
-        const Spacer(),
-      ],
-    );
+            ),
+            SizedBox(
+              height: lowerSpace > 240 ? lowerSpace : 240,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  outputPath != null
+                      ? _PreviewMenu()
+                      : Text(
+                          waitingMessage(context),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            // color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 

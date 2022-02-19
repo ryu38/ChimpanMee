@@ -88,18 +88,20 @@ final darkTheme = ThemeData.dark().copyWith(
 
 extension ColorSchemeExt on ColorScheme {
   Color get secondaryButtonPrimary => _setColor(
-    light: AppColors.banana,
-    dark: AppColors.darkCoffee,
-  );
+        light: AppColors.banana,
+        dark: AppColors.darkCoffee,
+      );
   Color get secondaryButtonText => _setColor(
-    light: Colors.brown,
-    dark: Colors.yellow,
-  );
+        light: Colors.brown,
+        dark: Colors.yellow,
+      );
 
   Color get navButtonColor => _setColor(
-    light: Colors.brown,
-    dark: Colors.yellow,
-  );
+        light: Colors.brown,
+        dark: Colors.yellow,
+      );
+
+  Color get cameraMarginColor => Colors.black26;
 
   Color _setColor({
     required Color light,

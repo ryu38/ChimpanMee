@@ -13,6 +13,7 @@ import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:chimpanmee/l10n/l10n.dart';
+import 'package:chimpanmee/theme/theme.dart';
 
 class CameraScreen extends ConsumerStatefulWidget {
   const CameraScreen({Key? key}) : super(key: key);
@@ -98,22 +99,20 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
         ref.watch(cameraStateProvider.select((v) => v.controller));
     return asyncController.when(
       data: (controller) => _CameraMain(controller: controller),
-      error: (error, _) => LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  handleException(context, error),
-                  const SizedBox(height: kBottomNavigationBarHeight + 60),
-                ],
-              ),
+      error: (error, _) => LayoutBuilder(builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                handleException(context, error),
+                const SizedBox(height: kBottomNavigationBarHeight + 60),
+              ],
             ),
-          );
-        }
-      ),
+          ),
+        );
+      }),
       loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
@@ -140,57 +139,87 @@ class __CameraMainState extends ConsumerState<_CameraMain> {
     return imageXFile.path;
   }
 
+  double get _minSpaceUnderCameraView => 184 + kBottomNavigationBarHeight;
+
   @override
   Widget build(BuildContext context) {
     final isCameraActive =
         ref.watch(cameraStateProvider.select((v) => v.isCameraActive));
-    return Column(
-      children: [
-        isCameraActive
-            ? _CameraDisplayer(controller: widget.controller)
-            : const SquareBox(),
-        const Spacer(),
-        Center(
-          child: ElevatedButton(
-            onPressed: !_takingPhoto
-                ? () async {
-                    if (_takingPhoto) return;
-                    setState(() {
-                      _takingPhoto = true;
-                    });
-                    final path = await _takePhoto(widget.controller);
-                    await ref
-                        .read(cameraStateProvider.notifier)
-                        .disposeCamera();
-                    await Navigator.of(context).pushNamed(
-                      PreviewScreen.route,
-                      arguments: path,
-                    );
-                    await ref.read(cameraStateProvider.notifier).initialize();
-                    setState(() {
-                      _takingPhoto = false;
-                    });
-                  }
-                : null,
-            style: ElevatedButton.styleFrom(
-              shape: const CircleBorder(),
-              padding: const EdgeInsets.all(20),
-              elevation: 0,
-              primary:
-                  Theme.of(context).floatingActionButtonTheme.backgroundColor,
-            ),
-            child: const Icon(
-              Icons.photo_camera,
-              size: 40,
+    return LayoutBuilder(builder: (context, constraints) {
+      final spaceUnderCameraView = constraints.maxHeight - constraints.maxWidth;
+      return Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Flexible(
+            child: Container(
+              color: Theme.of(context).colorScheme.cameraMarginColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  isCameraActive
+                      ? _CameraDisplayer(controller: widget.controller)
+                      : const SquareBox(),
+                ],
+              ),
             ),
           ),
-        ),
-        const Spacer(),
-        const SizedBox(
-          height: kBottomNavigationBarHeight,
-        ),
-      ],
-    );
+          SizedBox(
+            height: spaceUnderCameraView > _minSpaceUnderCameraView 
+                ? spaceUnderCameraView 
+                : _minSpaceUnderCameraView,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  child: Center(
+                    child: ElevatedButton(
+                      onPressed: !_takingPhoto
+                          ? () async {
+                              if (_takingPhoto) return;
+                              setState(() {
+                                _takingPhoto = true;
+                              });
+                              final path = await _takePhoto(widget.controller);
+                              await ref
+                                  .read(cameraStateProvider.notifier)
+                                  .disposeCamera();
+                              await Navigator.of(context).pushNamed(
+                                PreviewScreen.route,
+                                arguments: path,
+                              );
+                              await ref
+                                  .read(cameraStateProvider.notifier)
+                                  .initialize();
+                              setState(() {
+                                _takingPhoto = false;
+                              });
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(20),
+                        elevation: 0,
+                        primary: Theme.of(context)
+                            .floatingActionButtonTheme
+                            .backgroundColor,
+                      ),
+                      child: const Icon(
+                        Icons.photo_camera,
+                        size: 40,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: kBottomNavigationBarHeight + 24,
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    });
   }
 }
 
