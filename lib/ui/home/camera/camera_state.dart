@@ -56,6 +56,9 @@ class CameraStateNotifier extends StateNotifier<CameraState> {
       final controller = _getCameraController(cameras[state.cameraId]);
       await controller.initialize();
       await controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
+      controller.addListener(() {
+        debugLog('change controller state');
+      });
       return controller;
     });
     final isCameraActive = controller.whenOrNull(data: (_) => true) ?? false;
@@ -75,13 +78,13 @@ class CameraStateNotifier extends StateNotifier<CameraState> {
     await initialize();
   }
 
-  Future<void> disposeCamera() async {
-    state.controller.whenData((controller) {
+  Future<void> closeCameraView() async {
+    await state.controller.whenOrNull(data: (controller) async {
       if (state.isCameraActive) {
-        controller.dispose();
         state = state.copyWith(
           isCameraActive: false,
         );
+        debugLog('camera hidden');
       }
     });
   }

@@ -94,7 +94,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen>
       );
     }
     return ErrorDisplay(
-      solveButtonText: 'Reload',
+      solveButtonText: l10n.errorReloadSolve,
       solveFunc: notifier.init,
     );
   }

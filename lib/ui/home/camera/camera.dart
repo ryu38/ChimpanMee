@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:chimpanmee/components/errors/app_exception.dart';
 import 'package:chimpanmee/components/errors/permission_denied.dart';
@@ -8,6 +10,7 @@ import 'package:chimpanmee/ui/home/camera/camera_error.dart';
 import 'package:chimpanmee/ui/home/camera/camera_state.dart';
 import 'package:chimpanmee/ui/home/preview/preview.dart';
 import 'package:chimpanmee/utlis/debug.dart';
+import 'package:chimpanmee/utlis/file_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,14 +18,33 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:chimpanmee/l10n/l10n.dart';
 import 'package:chimpanmee/theme/theme.dart';
 
-class CameraScreen extends ConsumerStatefulWidget {
+// LayoutBuilderの反映がcamera controllerに追いつかない?
+// controllerの処理はstateNotifierでやらないことにした
+
+class CameraScreen extends StatelessWidget {
   const CameraScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+        builder: (context, constraints) =>
+            _CameraLoader(screenConstraints: constraints));
+  }
+}
+
+class _CameraLoader extends ConsumerStatefulWidget {
+  const _CameraLoader({
+    Key? key,
+    required this.screenConstraints,
+  }) : super(key: key);
+
+  final BoxConstraints screenConstraints;
 
   @override
   _CameraScreenState createState() => _CameraScreenState();
 }
 
-class _CameraScreenState extends ConsumerState<CameraScreen>
+class _CameraScreenState extends ConsumerState<_CameraLoader>
     with WidgetsBindingObserver {
   CameraStateNotifier get notifier => ref.read(cameraStateProvider.notifier);
 
@@ -88,31 +110,34 @@ class _CameraScreenState extends ConsumerState<CameraScreen>
       );
     }
     return ErrorDisplay(
-      solveButtonText: 'Reload',
+      solveButtonText: l10n.errorReloadSolve,
       solveFunc: notifier.initialize,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final constraints = widget.screenConstraints;
+    debugLog(constraints);
     final asyncController =
         ref.watch(cameraStateProvider.select((v) => v.controller));
     return asyncController.when(
-      data: (controller) => _CameraMain(controller: controller),
-      error: (error, _) => LayoutBuilder(builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                handleException(context, error),
-                const SizedBox(height: kBottomNavigationBarHeight + 60),
-              ],
-            ),
+      data: (controller) => _CameraMain(
+        controller: controller,
+        screenConstraints: constraints,
+      ),
+      error: (error, _) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              handleException(context, error),
+              const SizedBox(height: kBottomNavigationBarHeight + 60),
+            ],
           ),
-        );
-      }),
+        ),
+      ),
       loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
@@ -122,9 +147,11 @@ class _CameraMain extends ConsumerStatefulWidget {
   const _CameraMain({
     Key? key,
     required this.controller,
+    required this.screenConstraints,
   }) : super(key: key);
 
   final CameraController controller;
+  final BoxConstraints screenConstraints;
 
   @override
   __CameraMainState createState() => __CameraMainState();
@@ -133,93 +160,114 @@ class _CameraMain extends ConsumerStatefulWidget {
 class __CameraMainState extends ConsumerState<_CameraMain> {
   bool _takingPhoto = false;
 
-  Future<String> _takePhoto(CameraController controller) async {
+  Future<File> _takePhoto(CameraController controller) async {
+    if (Platform.isIOS) {
+      try {
+        await controller.setFlashMode(FlashMode.off);
+      } on Exception {}
+    }
     final imageXFile = await controller.takePicture();
-    await FlutterExifRotation.rotateAndSaveImage(path: imageXFile.path);
-    return imageXFile.path;
+    final rotatedFile =
+        await FlutterExifRotation.rotateImage(path: imageXFile.path);
+    return rotatedFile;
+  }
+
+  Future<void> _shutterButtonAction() async {
+    if (_takingPhoto) return;
+    setState(() {
+      _takingPhoto = true;
+    });
+    final rotatedFile = await _takePhoto(widget.controller);
+    debugLog('photo is taken');
+    await ref.read(cameraStateProvider.notifier).closeCameraView();
+    if (!ref.read(cameraStateProvider).isCameraActive) {
+      debugLog('camera deactive');
+      await widget.controller.dispose();
+    }
+    await Navigator.of(context).pushNamed(
+      PreviewScreen.route,
+      arguments: rotatedFile.path,
+    );
+    rotatedFile.deleteSync();
+    await ref.read(cameraStateProvider.notifier).initialize();
+    setState(() {
+      _takingPhoto = false;
+    });
   }
 
   double get _minSpaceUnderCameraView => 184 + kBottomNavigationBarHeight;
 
   @override
   Widget build(BuildContext context) {
-    final isCameraActive =
-        ref.watch(cameraStateProvider.select((v) => v.isCameraActive));
-    return LayoutBuilder(builder: (context, constraints) {
-      final spaceUnderCameraView = constraints.maxHeight - constraints.maxWidth;
-      return Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Flexible(
-            child: Container(
-              color: Theme.of(context).colorScheme.cameraMarginColor,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  isCameraActive
-                      ? _CameraDisplayer(controller: widget.controller)
-                      : const SquareBox(),
-                ],
-              ),
+    final constraints = widget.screenConstraints;
+    final spaceUnderCameraView = constraints.maxHeight - constraints.maxWidth;
+
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Flexible(
+          child: Container(
+            color: Theme.of(context).colorScheme.cameraMarginColor,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [_CameraWrapper(controller: widget.controller)],
             ),
           ),
-          SizedBox(
-            height: spaceUnderCameraView > _minSpaceUnderCameraView 
-                ? spaceUnderCameraView 
-                : _minSpaceUnderCameraView,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 40),
-                  child: Center(
-                    child: ElevatedButton(
-                      onPressed: !_takingPhoto
-                          ? () async {
-                              if (_takingPhoto) return;
-                              setState(() {
-                                _takingPhoto = true;
-                              });
-                              final path = await _takePhoto(widget.controller);
-                              await ref
-                                  .read(cameraStateProvider.notifier)
-                                  .disposeCamera();
-                              await Navigator.of(context).pushNamed(
-                                PreviewScreen.route,
-                                arguments: path,
-                              );
-                              await ref
-                                  .read(cameraStateProvider.notifier)
-                                  .initialize();
-                              setState(() {
-                                _takingPhoto = false;
-                              });
-                            }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        shape: const CircleBorder(),
-                        padding: const EdgeInsets.all(20),
-                        elevation: 0,
-                        primary: Theme.of(context)
-                            .floatingActionButtonTheme
-                            .backgroundColor,
-                      ),
-                      child: const Icon(
-                        Icons.photo_camera,
-                        size: 40,
-                      ),
+        ),
+        SizedBox(
+          height: spaceUnderCameraView > _minSpaceUnderCameraView
+              ? spaceUnderCameraView
+              : _minSpaceUnderCameraView,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: !_takingPhoto ? _shutterButtonAction : null,
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(20),
+                      elevation: 0,
+                      primary: Theme.of(context)
+                          .floatingActionButtonTheme
+                          .backgroundColor,
+                    ),
+                    child: const Icon(
+                      Icons.photo_camera,
+                      size: 40,
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: kBottomNavigationBarHeight + 24,
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(
+                height: kBottomNavigationBarHeight + 24,
+              ),
+            ],
           ),
-        ],
-      );
-    });
+        ),
+      ],
+    );
+  }
+}
+
+class _CameraWrapper extends ConsumerWidget {
+  const _CameraWrapper({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  final CameraController controller;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isCameraActive =
+        ref.watch(cameraStateProvider.select((v) => v.isCameraActive));
+    if (isCameraActive) {
+      return _CameraDisplayer(controller: controller);
+    }
+    return const SquareBox();
   }
 }
 

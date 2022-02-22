@@ -41,7 +41,7 @@ class PreviewScreen extends StatelessWidget {
           appBar: AppBar(
             title: Text(l10n.appBarPreview),
           ),
-          body: _Content(),
+          body: const _Content(),
         ),
       ),
     );

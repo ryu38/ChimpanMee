@@ -42,7 +42,7 @@ class WebScreen extends ConsumerWidget {
     final l10n = L10n.of(context)!;
 
     final imageFile = ref.watch(webStateProvider.select((v) => v.imageFile));
-    final url = ref.watch(webStateProvider.select((v) => v.url));
+    final isLoading = ref.watch(webStateProvider.select((v) => v.isLoading));
     final exception = ref.watch(webStateProvider.select((v) => v.exception));
 
     final notifier = ref.read(webStateProvider.notifier);
