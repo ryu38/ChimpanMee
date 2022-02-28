@@ -12,6 +12,7 @@
   "navBarWeb": "ウェブ",
   "webNextButton": "次へ",
   "webTextFieldHint": "画像アドレスを入力してください",
+  "webLoading": "読み込み中",
   "webSampleImage": "サンプル画像",
 
   "appBarEdit": "プレビュー",

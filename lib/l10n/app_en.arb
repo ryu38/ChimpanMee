@@ -15,6 +15,7 @@
   "navBarWeb": "web",
   "webNextButton": "Next",
   "webTextFieldHint": "Enter image link",
+  "webLoading": "Loading",
   "webSampleImage": "Sample Image",
 
   "appBarEdit": "Preview",

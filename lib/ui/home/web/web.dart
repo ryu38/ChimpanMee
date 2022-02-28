@@ -61,7 +61,8 @@ class WebScreen extends ConsumerWidget {
               ),
               decoration: InputDecoration(
                 hintText: l10n.webTextFieldHint,
-                errorText: _handleException(context, exception),
+                errorText:
+                    isLoading ? null : _handleException(context, exception),
                 border: OutlineInputBorder(
                   borderSide: BorderSide.none,
                   borderRadius: BorderRadius.circular(160),
@@ -78,6 +79,19 @@ class WebScreen extends ConsumerWidget {
                 await notifier.loadImage(inputUrl);
               },
             ),
+            if (isLoading)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8, left: 20),
+                  child: Text(
+                    '${l10n.webLoading} ...',
+                    style: const TextStyle(
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ),
             TextButton(
               onPressed: () {
                 urlController.text = sampleUrl;
