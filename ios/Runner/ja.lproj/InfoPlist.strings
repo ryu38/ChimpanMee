@@ -1,0 +1,10 @@
+/* 
+  InfoPlist.strings
+  Runner
+
+  Created by 久賀隆矢 on 2022/04/22.
+  
+*/
+
+NSCameraUsageDescription = "アプリはカメラで撮影した写真からチンパンジーを生成します。";
+NSPhotoLibraryUsageDescription = "アプリはライブラリの写真からチンパンジーを生成します。";

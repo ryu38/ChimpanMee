@@ -30,9 +30,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Need camera access for taking photo in the app</string>
+	<string>The app uses the camera to generate a chimpanzee form a taken photo.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Need library access for using photos from library</string>
+	<string>The app uses photos to generate images of chimpanzees.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
